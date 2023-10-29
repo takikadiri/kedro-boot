@@ -19,8 +19,8 @@ with open("README.md", encoding="utf-8") as file_handler:
 
 setup(
     name="kedro-boot",
-    version="0.0.1",
-    description="A framework that streamlines the integration of Kedro projects with various applications. It serves as a bridge that shape the interactions between an application and Kedro's resources",
+    version="0.1.0",
+    description="A kedro plugin that streamlines the integration between Kedro projects and external applications, making it easier for you to develop production-ready data science applications.",
     license="Apache Software License (Apache 2.0)",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -45,7 +45,6 @@ setup(
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
             "ruff==0.1.3",
-            "scikit-learn>=0.23.0, <1.4.0",
             "kedro-datasets[pandas.CSVDataSet]",
         ],
         "dev": [
@@ -54,7 +53,7 @@ setup(
         ],
     },
     entry_points={"kedro.project_commands": ["boot =  kedro_boot.booter:commands"]},
-    keywords="kedro-plugin, deployment, application integration, framework, pipelines, machine learning, data pipelines, data science, data engineering, model serving, mlops",
+    keywords="kedro-plugin, framework, data apps, pipelines, machine learning, data pipelines, data science, data engineering, model serving, mlops, dataops",
     classifiers=[
         "Programming Language :: Python :: 3",
         "Framework :: Kedro",
