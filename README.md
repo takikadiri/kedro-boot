@@ -6,7 +6,7 @@
 [![Powered by Kedro](https://img.shields.io/badge/powered_by-kedro-ffc900?logo=kedro)](https://kedro.org)
 
 # What is kedro-boot ?
-Kedro Boot is a [kedro plugin](https://docs.kedro.org/en/stable/extend_kedro/plugins.html) that streamlines the integration between Kedro projects and external applications. It offers a structured method for seamlessly interacting with kedro's pipeline and catalog. This include features like injecting application data into kedro catalog and dynamically orchestrating multiple kedro pipeline runs.
+Kedro Boot is a [kedro plugin](https://docs.kedro.org/en/stable/extend_kedro/plugins.html) that streamlines the integration between Kedro projects and external applications. It offers a framework for seamlessly interacting with kedro's pipeline and catalog. This include features like injecting application's data into kedro catalog and dynamically orchestrating multiple kedro pipeline runs.
 
 This enable using Kedro pipelines in a wide range of online and low latency use cases, including model serving, data apps (streamlit, dash), statistical simulations, paralell processing of unstructured data, streaming, and more.
 
@@ -206,11 +206,11 @@ Kedro Boot unlock the value of your kedro pipelines by giving you a structured w
 
 Kedro Boot apps utilize Kedro's pipeline as a means to construct and manage business logic. Kedro's underlying principles and internals ensure the maintainability, clarity, reuse, and visibility (kedro-viz) of business logic within Kedro Boot apps, thanks to Kedro's declarative nature.
 
-While Kedro Boot apps adopts the declarative approach for handling its business logic, it opt for an explicit and imperative approach for orchestrating and utilizing this logic, allowing for a wide range of use cases. We believe that this blend of declarative and imperative approaches through Kedro Boot can enable the development of end-to-end production-ready data science applications.
+While Kedro Boot apps adopts the declarative approach for handling its business logic through kedro pipelines, they opt for an explicit and imperative approach for orchestrating and utilizing those pipelines. This choice allows for a wide range of use cases. We believe that this blend of declarative and imperative approaches through Kedro Boot can enable the development of end-to-end production-ready data science applications.
 
 ## Where do I test Kedro Boot ?
 
-You can refer to the Kedro Boot Examples repository; it will guide you through three examples of Kedro Boot usages.
+You can refer to the [Kedro Boot Examples](https://github.com/takikadiri/kedro-boot-examples) repository; it will guide you through three examples of Kedro Boot usages.
 
 ## Can I contribute ?
 
