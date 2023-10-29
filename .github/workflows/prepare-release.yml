@@ -1,0 +1,66 @@
+name: create-release-candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_part:
+        description: The part of the version to update (patch, minor or major)
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+        default: 'patch'
+        required: true
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11]
+    env:
+      PYTHON_PACKAGE: kedro_boot
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Validate inputs
+      run: |
+        echo "INPUT_VERSION_PART: ${{ github.event.inputs.version_part }}"
+    - name: Bump the version number
+      id: bump_version
+      run: |
+        pip install bump2version
+        bump2version ${{ github.event.inputs.version_part }}
+        echo "::set-output name=package_version::$(python setup.py --version)"
+    - name: Update the CHANGELOG according to 'Keep a Changelog' guidelines
+      uses: thomaseizinger/keep-a-changelog-new-release@v1
+      with:
+        version: ${{ steps.bump_version.outputs.package_version }}
+    - name: Create a new release branch
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git checkout -b release-${{ steps.bump_version.outputs.package_version }}
+        git push -u origin release-${{ steps.bump_version.outputs.package_version }}
+    - name: Commit the changes
+      run: |
+        git commit -am "Bump version and CHANGELOG for release ${{ steps.bump_version.outputs.package_version }}"
+        git push
+    - name: Open a PR to merge the release to main
+      id: open_pr
+      uses: vsoch/pull-request-action@1.0.23
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PULL_REQUEST_BRANCH: main
+        PULL_REQUEST_FROM_BRANCH: release-${{ steps.bump_version.outputs.package_version }}
+        PULL_REQUEST_TITLE: "Release ${{ steps.bump_version.outputs.package_version }}"
+        PULL_REQUEST_BODY: "Bump version and CHANGELOG for next release."
+        PULL_REQUEST_ASSIGNEES: "${{ github.repository_owner }}"
+    - name: Change the commit message to add PR number
+      run: |
+        git commit -a --amend -m ":rocket: Bump version and CHANGELOG for release ${{ steps.bump_version.outputs.package_version }} (#${{ steps.open_pr.outputs.pull_request_number }})"
+        git push -f
