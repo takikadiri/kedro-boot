@@ -72,6 +72,11 @@ class KedroBootRunner(AbstractRunner):
             pipeline = app_pipeline(pipeline, name=DEFAULT_PIPELINE_VIEW_NAME)
 
         hook_manager = hook_manager or _NullPluginManager()
+
+        # touching each dataset in the pipeline to render dataset factory datasets correctly
+        for dataset in pipeline.data_sets():
+            catalog.exists(dataset)
+            
         catalog = catalog.shallow_copy()
 
         unsatisfied = pipeline.inputs() - set(catalog.list())
