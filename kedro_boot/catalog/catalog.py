@@ -47,37 +47,19 @@ class AppCatalog:
             catalog_view = CatalogView(name=pipeline_view.name)
 
             pipeline_inputs = {
-                dataset_name: self.catalog._data_sets[dataset_name]
+                dataset_name: self.catalog._get_dataset(dataset_name)
                 for dataset_name in pipeline.inputs()
             }
-            print(pipeline_inputs)
             compile_with_pipeline_inputs(
                 catalog_view=catalog_view,
                 pipeline_inputs=pipeline_inputs,
                 pipeline_view=pipeline_view,
             )
 
-            # pipeline_outputs = {dataset_name: self.catalog._data_sets[dataset_name] for dataset_name in pipeline.outputs()}
-            # print(pipeline_outputs)
-            # compile_with_pipeline_outputs(
-            #     catalog_view=catalog_view,
-            #     pipeline_outputs=pipeline_outputs,
-            #     pipeline_view=pipeline_view,
-            # )
-
-            # pipeline_intermediary = {dataset_name: self.catalog._data_sets[dataset_name] for dataset_name in pipeline.all_inputs() & pipeline.all_outputs()}
-            # print(pipeline_intermediary)
-            # compile_with_pipeline_intermediary(
-            #     catalog_view=catalog_view,
-            #     pipeline_intermediary=pipeline_intermediary,
-            #     pipeline_view=pipeline_view,
-            # )
-
             all_pipeline_outputs = {
-                dataset_name: self.catalog._data_sets[dataset_name]
+                dataset_name: self.catalog._get_dataset(dataset_name)
                 for dataset_name in pipeline.all_outputs()
             }
-            print(all_pipeline_outputs)
             compile_with_all_pipeline_outputs(
                 catalog_view=catalog_view,
                 all_pipeline_outputs=all_pipeline_outputs,
@@ -85,11 +67,6 @@ class AppCatalog:
             )
 
             self.catalog_views.append(catalog_view)
-
-            # if not catalog_view.outputs:
-            #     LOGGER.warning(
-            #         f"No output datasets were given for the current pipeline namespace '{catalog_view.namespace}'. We gonna return all free pipeline outputs"
-            #     )
 
             LOGGER.info(
                 "catalog compilation completed for the pipeline view '%s'. Here is the report:\n"
@@ -108,7 +85,6 @@ class AppCatalog:
 
         LOGGER.info("Catalog compilation completed.")
 
-    # def render(self, name: str, inputs: dict | None = None, outputs: dict | None = None, parameters: dict | None = None, templates: dict | None = None, artifacts: dict | None = None) -> DataCatalog:
     def render(
         self,
         name: str,
