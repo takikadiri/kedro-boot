@@ -31,7 +31,7 @@ def mock_catalog() -> DataCatalog:
     dataset_a = MemoryDataSet(1)
     dataset_b = MemoryDataSet(2)
     dataset_c = MemoryDataSet(3)
-    dataset_d = CSVDataSet("data/01_raw/test_data_[[ date_param ]].csv")
+    dataset_d = CSVDataSet("data/01_raw/test_data_${oc.select:date_param}.csv")
     catalog = DataCatalog(
         {"A": dataset_a, "B": dataset_b, "C": dataset_c, "D": dataset_d}
     )

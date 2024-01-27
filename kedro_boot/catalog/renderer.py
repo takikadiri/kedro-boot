@@ -3,9 +3,10 @@
 import copy
 import logging
 from pathlib import PurePath
+import re
 from typing import Any, Dict, List, Union
+from omegaconf import OmegaConf
 
-from jinja2 import Environment, Template, meta
 from kedro.io import MemoryDataSet
 
 LOGGER = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ def render_template_datasets(
     )
     if remaining_catalog_tempate_params:
         LOGGER.warning(
-            f"The is not enough given iteration template param to render all the Template expressions. Template expressions are {set(template_params)} and the actual given template params are {set(iteration_template_params)}. Default values will be used if given in jinja expression '[[ expression | default('value') ]]' for {remaining_catalog_tempate_params}"
+            f"The is not enough given iteration template param to render all the Template expressions. Template expressions are {set(template_params)} and the actual given template params are {set(iteration_template_params)}. Default values will be used for {remaining_catalog_tempate_params}"
         )
 
     iteration_template_params_without_run_id = set(iteration_template_params) - {
@@ -161,18 +162,17 @@ def recursively_render_template(
     dataset_attributes: Union[str, list, dict, PurePath], template_args: dict
 ) -> Union[None, str, list, dict, PurePath]:
     if isinstance(dataset_attributes, str):
-        return Template(
-            dataset_attributes, variable_start_string="[[", variable_end_string="]]"
-        ).render(template_args)
+        config = OmegaConf.create(
+            {**{"dataset_entry": dataset_attributes}, **template_args}
+        )
+        return config.dataset_entry
 
     elif isinstance(dataset_attributes, PurePath):
-        return PurePath(
-            Template(
-                str(dataset_attributes),
-                variable_start_string="[[",
-                variable_end_string="]]",
-            ).render(template_args)
+        config = OmegaConf.create(
+            {**{"dataset_entry": str(dataset_attributes)}, **template_args}
         )
+
+        return PurePath(config.dataset_entry)
 
     elif isinstance(dataset_attributes, dict):
         for key in dataset_attributes:
@@ -205,24 +205,17 @@ def recursively_get_dataset_template_params(datasets: dict) -> List[str]:
     return template_params
 
 
-env = Environment(
-    block_start_string="[[%",
-    block_end_string="%]]",
-    variable_start_string="[[",
-    variable_end_string="]]",
-    comment_start_string="[[#",
-    comment_end_string="#]]",
-)
-
-
 def recursively_get_template_params(
     dataset_attributes: Union[str, list, dict, PurePath]
 ) -> List[str]:
     if isinstance(dataset_attributes, str):
-        return list(meta.find_undeclared_variables(env.parse(dataset_attributes)))
+        config = OmegaConf.create({"dataset_entry": dataset_attributes})
+        return list(find_config_interpolation_keys(config))
+        # return list(meta.find_undeclared_variables(env.parse(dataset_attributes)))
 
     elif isinstance(dataset_attributes, PurePath):
-        return list(meta.find_undeclared_variables(env.parse(str(dataset_attributes))))
+        config = OmegaConf.create({"dataset_entry": str(dataset_attributes)})
+        return list(find_config_interpolation_keys(config))
 
     elif isinstance(dataset_attributes, dict):
         template_params = []
@@ -251,6 +244,24 @@ def _recursive_dict_update(original_dict, new_dict):
         else:
             original_dict[key] = value
     return original_dict
+
+
+def find_config_interpolation_keys(config):
+    interpolation_keys = set()
+    interpolation_pattern = re.compile(r"\$\{oc\.select\s*:\s*([^,\s]+)\s*,")
+
+    def extract_keys(cfg):
+        for key, value in cfg.items_ex(resolve=False):
+            if isinstance(value, str):
+                keys = [
+                    match.group(1) for match in interpolation_pattern.finditer(value)
+                ]
+                interpolation_keys.update(keys)
+            elif OmegaConf.is_config(value):
+                extract_keys(value)
+
+    extract_keys(config)
+    return interpolation_keys
 
 
 class CatalogRendererError(Exception):

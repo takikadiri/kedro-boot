@@ -1,9 +1,9 @@
 """Helper functions for compiling catalog_views's datasets"""
 
 import logging
-import re
 from pathlib import PurePath
 from typing import Any, Dict, Union
+from omegaconf import OmegaConf
 
 from kedro.io import MemoryDataSet
 
@@ -116,7 +116,7 @@ def compile_with_all_pipeline_outputs(
 def recursively_check_parametrized_values(
     dataset_attributes: Union[str, list, dict, PurePath]
 ) -> bool:  # noqa: PLR0911
-    """Helper that check if any of the dataset attributes is parametrized (contains [[...]])
+    """Helper that check if any of the dataset attributes is parametrized (contains ${oc.select:param_name,default_value})
 
     Args:
         dataset (Any): Any kedro dataset
@@ -125,10 +125,13 @@ def recursively_check_parametrized_values(
         bool: _description_
     """
     if isinstance(dataset_attributes, str):
-        return bool(re.search(r"\[\[.*?\]\]", dataset_attributes))
+        config = OmegaConf.create({"dataset_entry": dataset_attributes})
+        return OmegaConf.is_interpolation(config, "dataset_entry")
+        # return bool(re.search(r"\[\[.*?\]\]", dataset_attributes))
 
     elif isinstance(dataset_attributes, PurePath):
-        return bool(re.search(r"\[\[.*?\]\]", str(dataset_attributes)))
+        config = OmegaConf.create({"dataset_entry": str(dataset_attributes)})
+        return OmegaConf.is_interpolation(config, "dataset_entry")
 
     elif isinstance(dataset_attributes, dict):
         for key in dataset_attributes:

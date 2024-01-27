@@ -2,7 +2,7 @@
 import logging
 from typing import Any, Optional, Union
 
-from kedro.config import ConfigLoader
+from kedro.config import OmegaConfigLoader
 from kedro.framework.hooks.manager import _NullPluginManager
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
@@ -21,7 +21,7 @@ class KedroBootRunner(AbstractRunner):
 
     def __init__(
         self,
-        config_loader: ConfigLoader,
+        config_loader: OmegaConfigLoader,
         app_class: str,
         app_args: Optional[dict] = None,
         lazy_compile: bool = False,
@@ -30,7 +30,7 @@ class KedroBootRunner(AbstractRunner):
         """Instantiate the kedro boot runner
 
         Args:
-            config_loader (ConfigLoader): kedro config loader
+            config_loader (OmegaConfigLoader): kedro config loader
             app_class (str): Path to the kedro boot app object. ex: kedro_boot.app.KedroBootApp
             app_args (dict): Args used for initializing kedro boot app object. Defaults to None.
         """
