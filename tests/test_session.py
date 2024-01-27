@@ -3,7 +3,7 @@ import pytest
 from kedro.pipeline import Pipeline
 from kedro_boot.pipeline import app_pipeline
 from kedro.framework.hooks.manager import _NullPluginManager
-from kedro.config import ConfigLoader
+from kedro.config import OmegaConfigLoader
 from kedro.io import DataCatalog
 
 
@@ -39,7 +39,7 @@ def test_session(
         catalog=mock_catalog,
         hook_manager=_NullPluginManager(),
         session_id="",
-        config_loader=ConfigLoader(""),
+        config_loader=OmegaConfigLoader(""),
     )
 
     session.compile_catalog()
@@ -68,7 +68,7 @@ def test_session_lazy_compile(
         catalog=mock_catalog,
         hook_manager=_NullPluginManager(),
         session_id="",
-        config_loader=ConfigLoader(""),
+        config_loader=OmegaConfigLoader(""),
     )
 
     results = session.run(**render_data)
@@ -96,7 +96,7 @@ def test_session_multi_compile(
         catalog=mock_catalog,
         hook_manager=_NullPluginManager(),
         session_id="",
-        config_loader=ConfigLoader(""),
+        config_loader=OmegaConfigLoader(""),
     )
 
     session.run(**render_data)

@@ -137,6 +137,12 @@ def kedro_boot_cli_factory(
         ) as session:
             runner_args = {"is_async": kedro_args["is_async"]}
             config_loader = session._get_config_loader()
+            config_loader._register_new_resolvers(
+                {
+                    "itertime_params": lambda variable,
+                    default_value=None: f"${{oc.select:{variable},{default_value}}}",
+                }
+            )
             runner = KedroBootRunner(
                 config_loader=config_loader,
                 app_class=boot_app_class,

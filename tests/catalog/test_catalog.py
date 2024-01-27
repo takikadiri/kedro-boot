@@ -20,7 +20,9 @@ parametrized_pipeline_views = [
             "outputs": {"C": MemoryDataSet(3)},
             "parameters": {},
             "artifacts": {},
-            "templates": {"D": CSVDataSet("data/01_raw/test_data_[[ data_date ]].csv")},
+            "templates": {
+                "D": CSVDataSet("data/01_raw/test_data_${itertime_param:data_date}.csv")
+            },
             "unmanaged": {"B": MemoryDataSet(2)},
         },
     ),
@@ -32,7 +34,9 @@ parametrized_pipeline_views = [
             "outputs": {"C": MemoryDataSet(3)},
             "parameters": {},
             "artifacts": {"B": MemoryDataSet(2)},
-            "templates": {"D": CSVDataSet("data/01_raw/test_data_[[ data_date ]].csv")},
+            "templates": {
+                "D": CSVDataSet("data/01_raw/test_data_${itertime_param:data_date}.csv")
+            },
             "unmanaged": {},
         },
     ),
