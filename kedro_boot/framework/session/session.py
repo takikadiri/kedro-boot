@@ -4,7 +4,7 @@ import logging
 import uuid
 from typing import Any, List, Optional
 
-from kedro.config import ConfigLoader
+from kedro.config import OmegaConfigLoader
 from kedro.io import DataCatalog
 from pluggy import PluginManager
 from kedro.pipeline.pipeline import Pipeline
@@ -30,8 +30,8 @@ class KedroBootSession:
         catalog: DataCatalog,
         hook_manager: PluginManager,
         session_id: str,
-        runtime_app_params: dict,
-        config_loader: ConfigLoader,
+        app_runtime_params: dict,
+        config_loader: OmegaConfigLoader,
     ) -> None:
         """Init the kedro boot session.
 
@@ -40,13 +40,13 @@ class KedroBootSession:
             catalog (DataCatalog): kedro ``DataCatalog`` object
             hook_manager (PluginManager): kedro  ``PluginManager`` object
             session_id (str): kedro ``KedroSession`` session_id
-            runtime_app_params (dict): params given by an App specific CLI
+            app_runtime_params (dict): params given by an App specific CLI
             config_loader (OmegaConfigLoader): kedro ``OmegaConfigLoader`` object
         """
         self._context = KedroBootContext(pipeline=pipeline, catalog=catalog)
         self._runner = KedroBootRunner(hook_manager=hook_manager, session_id=session_id)
 
-        self.runtime_app_params = runtime_app_params
+        self.app_runtime_params = app_runtime_params
         self.config_loader = config_loader
 
         self._is_catalog_compiled = False

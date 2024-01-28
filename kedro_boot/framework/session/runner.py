@@ -32,7 +32,6 @@ class KedroBootRunner:
             session_id=self._session_id,
         )
 
-        print(catalog._data_sets)
         output_datasets = {}
         # if multiple outputs datasets, load the returned datasets indexed by pipeline view outputs
         if outputs_datasets and len(outputs_datasets) > 1:
@@ -44,11 +43,10 @@ class KedroBootRunner:
             output_datasets = catalog.load(list(outputs_datasets)[0])
         # If no pipeline view outputs, load all the memorydatasets outputs
         else:
-            print(catalog._data_sets)
             output_datasets = {
                 dataset_name: catalog.load(dataset_name)
                 for dataset_name in pipeline.outputs()
-                if catalog._data_sets[dataset_name].__class__.__name__.lower()
+                if catalog._datasets[dataset_name].__class__.__name__.lower()
                 == "memorydataset"
             }
         return output_datasets

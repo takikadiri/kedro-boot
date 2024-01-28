@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, List
 
-from kedro.config import ConfigLoader
+from kedro.config import OmegaConfigLoader
 from kedro.io import DataCatalog
 from pluggy import PluginManager
 
@@ -26,8 +26,8 @@ class AbstractKedroBootApp(ABC):
         catalog: DataCatalog,
         hook_manager: PluginManager,
         session_id: str,
-        runtime_app_params: dict,
-        config_loader: ConfigLoader,
+        app_runtime_params: dict,
+        config_loader: OmegaConfigLoader,
     ) -> Any:
         """Create a ``KedroBootSession`` then run the kedro boot app
 
@@ -50,7 +50,7 @@ class AbstractKedroBootApp(ABC):
             catalog=catalog,
             hook_manager=hook_manager,
             session_id=session_id,
-            runtime_app_params=runtime_app_params,
+            app_runtime_params=app_runtime_params,
             config_loader=config_loader,
         )
 
