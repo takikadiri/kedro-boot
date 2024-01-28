@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 from kedro.io import DataCatalog
 
 from kedro.pipeline.pipeline import Pipeline
-from kedro.io import MemoryDataSet
+from kedro.io import MemoryDataset
 from kedro_boot.utils import find_duplicates
 
 from kedro_boot.framework.compiler.compiler import (
@@ -175,7 +175,7 @@ class KedroBootContext:
             LOGGER.info(f"Loading {dataset_name} as a MemoryDataset")
             all_materialized_artifact_datasets[
                 dataset_name
-            ] = MemoryDataSet(  # Add Logging fro this operation
+            ] = MemoryDataset(  # Add Logging fro this operation
                 dataset_value.load(), copy_mode="assign"
             )
 

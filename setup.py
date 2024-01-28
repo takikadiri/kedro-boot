@@ -45,7 +45,7 @@ setup(
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
             "ruff==0.1.3",
-            "kedro-datasets[pandas.CSVDataSet]",
+            "kedro-datasets",
         ],
         "dev": [
             "pre-commit>=2.0.0,<4.0.0",

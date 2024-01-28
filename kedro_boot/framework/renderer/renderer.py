@@ -7,7 +7,7 @@ import re
 from typing import Any, Dict, List, Union
 from omegaconf import OmegaConf
 
-from kedro.io import MemoryDataSet
+from kedro.io import MemoryDataset
 
 LOGGER = logging.getLogger(__name__)
 
@@ -98,13 +98,13 @@ def render_parameter_datasets(
             parameters = rendered_dataset_value.load()
 
             if isinstance(parameters, dict):
-                rendered_datasets[dataset_name] = MemoryDataSet(
+                rendered_datasets[dataset_name] = MemoryDataset(
                     _recursive_dict_update(
                         parameters, formatted_iteration_params.get(dataset_name)
                     )
                 )
             else:
-                rendered_datasets[dataset_name] = MemoryDataSet(
+                rendered_datasets[dataset_name] = MemoryDataset(
                     formatted_iteration_params[dataset_name]
                 )
         else:
@@ -147,11 +147,11 @@ def render_input_datasets(
             import pandas as pd
 
             LOGGER.info(f"Converting '{dataset_name}' to pandas")
-            rendered_dataset_value = MemoryDataSet(
+            rendered_dataset_value = MemoryDataset(
                 pd.json_normalize(iteration_inputs[dataset_name])
             )
         else:
-            rendered_dataset_value = MemoryDataSet(iteration_inputs[dataset_name])
+            rendered_dataset_value = MemoryDataset(iteration_inputs[dataset_name])
         rendered_datasets[dataset_name] = rendered_dataset_value
 
     return rendered_datasets

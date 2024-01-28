@@ -7,7 +7,6 @@ import click
 from click import Command
 from click.decorators import FC
 from kedro.framework.cli.project import run as kedro_run_command
-from kedro.framework.cli.utils import _get_values_as_tuple
 from kedro.framework.session import KedroSession
 from kedro.utils import load_obj
 from kedro_boot.app.app import AbstractKedroBootApp
@@ -52,20 +51,8 @@ def create_kedro_booter(
                 LOGGER.info("We're gettings app class from --app CLI arg")
                 app = app_factory(cli_app_class)
 
-        # Format some kedro args
-        tag = _get_values_as_tuple(kedro_args.get("tag", ""))
-        node_names = _get_values_as_tuple(kedro_args.get("node_names", ""))
-
-        tags = _get_values_as_tuple(kedro_args.get("tags", ""))
-        nodes_names = _get_values_as_tuple(kedro_args.get("nodes_names", ""))
-
-        tag = tag + tags
-        node_names = node_names + nodes_names
-
-        load_version = {
-            **kedro_args.get("load_version", {}),
-            **kedro_args.get("load_versions", {}),
-        }
+        tuple_tags = tuple(kedro_args.get("tags", ""))
+        tuple_node_names = tuple(kedro_args.get("node_names", ""))
 
         with KedroSession.create(
             env=kedro_args.get("env", ""),
@@ -84,7 +71,7 @@ def create_kedro_booter(
                 runner = KedroBootAdapter(
                     app=app,
                     config_loader=config_loader,
-                    app_run_args=app_run_args,
+                    app_runtime_params=app_run_args,
                 )
             else:
                 runner_obj = load_obj(
@@ -93,14 +80,14 @@ def create_kedro_booter(
                 runner = runner_obj(is_async=kedro_args.get("is_async", ""))
 
             return session.run(
-                tags=tag,
+                tags=tuple_tags,
                 runner=runner,
-                node_names=node_names,
+                node_names=tuple_node_names,
                 from_nodes=kedro_args.get("from_nodes", ""),
                 to_nodes=kedro_args.get("to_nodes", ""),
                 from_inputs=kedro_args.get("from_inputs", ""),
                 to_outputs=kedro_args.get("to_outputs", ""),
-                load_versions=load_version,
+                load_versions=kedro_args.get("load_versions", {}),
                 pipeline_name=kedro_args.get("pipeline", ""),
                 namespace=kedro_args.get("namespace", ""),
             )

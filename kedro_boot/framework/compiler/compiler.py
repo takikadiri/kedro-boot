@@ -4,6 +4,7 @@ import logging
 from pathlib import PurePath
 from typing import Any, Dict, Optional, Union
 from omegaconf import OmegaConf
+from kedro.io import AbstractDataset
 
 from .specs import CompilationSpec
 
@@ -93,7 +94,7 @@ def compile_with_pipeline_inputs(
 
 def compile_with_all_pipeline_outputs(
     all_pipeline_outputs: Dict[
-        str, Any
+        str, AbstractDataset
     ],  # Any is AbstractDataSet, for retrocompatibility reasons we don't specify the type as it was renamed lately to AbstractDataset
     compilation_spec: CompilationSpec,
 ) -> CatalogAssembly:
@@ -114,7 +115,7 @@ def compile_with_all_pipeline_outputs(
         if dataset_name in compilation_spec.namespaced_outputs:
             if dataset_value.__class__.__name__.lower() != "memorydataset":
                 LOGGER.warning(
-                    f"This pipeline output '{dataset_name}' will cost you an I/O operation, please consider freeing it (making it a MemoryDataSet)."
+                    f"This pipeline output '{dataset_name}' will cost you an I/O operation, please consider freeing it (making it a MemoryDataset)."
                 )
 
             catalog_assembly.outputs[dataset_name] = dataset_value
