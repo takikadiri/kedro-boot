@@ -9,6 +9,7 @@ from click.decorators import FC
 from kedro.framework.cli.project import run as kedro_run_command
 from kedro.framework.session import KedroSession
 from kedro.utils import load_obj
+from kedro.framework.project import settings
 from kedro_boot.app.app import AbstractKedroBootApp
 from kedro_boot.framework.adapter import KedroBootAdapter
 
@@ -46,6 +47,17 @@ def create_kedro_booter(
         if app_class:
             app = app_factory(app_class, app_args)
         else:
+            settings_app = {}
+            if hasattr(settings, "APP_CLASS"):
+                settings_app["app_class"] = settings.APP_CLASS
+                if hasattr(settings, "APP_ARGS"):
+                    settings_app["app_args"] = settings.APP_ARGS
+                app = app_factory(**settings_app)
+            else:
+                LOGGER.info(
+                    "No APP_CLASS given in settings.py. We gonna get it from --app args"
+                )
+
             cli_app_class = app_run_args.pop("app")
             if cli_app_class:
                 LOGGER.info("We're gettings app class from --app CLI arg")
@@ -57,7 +69,7 @@ def create_kedro_booter(
         with KedroSession.create(
             env=kedro_args.get("env", ""),
             extra_params=kedro_args.get("params", ""),
-            conf_source=kedro_args.get("conf_source", ""),  # type: ignore
+            conf_source=kedro_args.get("conf_source", ""),
             **kedro_session_create_args,  # TODO: Make sure that this not take precedence over kedro_args. We should do some prior merging before kwarging
         ) as session:
             config_loader = session._get_config_loader()
