@@ -1,27 +1,33 @@
 """``AbstractKedroBootApp`` is the base class for all kedro boot app implementations.
 """
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, List
 
-from kedro.config import OmegaConfigLoader
+from kedro.config import ConfigLoader
 from kedro.io import DataCatalog
 from pluggy import PluginManager
 
-from kedro_boot.pipeline import AppPipeline
-from kedro_boot.session import KedroBootSession
+from kedro.pipeline.pipeline import Pipeline
+from kedro_boot.framework.session import KedroBootSession
+from kedro_boot.framework.compiler.specs import CompilationSpec
 
 
 class AbstractKedroBootApp(ABC):
     """``AbstractKedroBootApp`` is the base class for all kedro boot app implementations"""
 
+    LAZY_COMPILE = False
+
+    def __init__(self, compilation_specs: List[CompilationSpec] = None) -> None:
+        self._compilation_specs = compilation_specs
+
     def run(
         self,
-        pipeline: AppPipeline,
+        pipeline: Pipeline,
         catalog: DataCatalog,
         hook_manager: PluginManager,
         session_id: str,
-        config_loader: OmegaConfigLoader,
-        lazy_compile: bool,
+        runtime_app_params: dict,
+        config_loader: ConfigLoader,
     ) -> Any:
         """Create a ``KedroBootSession`` then run the kedro boot app
 
@@ -30,21 +36,26 @@ class AbstractKedroBootApp(ABC):
             catalog: The base ``DataCatalog`` from which to fetch data.
             hook_manager: The ``PluginManager`` to activate hooks.
             session_id: The id of the kedro session.
+            runtime_app_params (dict): params given by an App specific CLI
+            config_loader (OmegaConfigLoader): kedro ``OmegaConfigLoader`` object
 
         Returns:
             Any: the return value of the kedro boot app run method
         """
+
+        config_loader.update({"application": ["application*/"]})
 
         session = KedroBootSession(
             pipeline=pipeline,
             catalog=catalog,
             hook_manager=hook_manager,
             session_id=session_id,
+            runtime_app_params=runtime_app_params,
             config_loader=config_loader,
         )
 
-        if not lazy_compile:
-            session.compile_catalog()
+        if not self.LAZY_COMPILE:
+            session.compile(compilation_specs=self._compilation_specs)
 
         return self._run(session)
 
@@ -54,7 +65,7 @@ class AbstractKedroBootApp(ABC):
         ``KedrobootSession`` have already be created by run().
 
         Args:
-            session (KedroBootSession): is the object that is responsible for managing the kedro boot app lifecycle
+            session (KedroBootSession): A user facing interface that expose kedro's resource to the kedro boot apps
         """
         pass
 
@@ -71,7 +82,7 @@ class DummyApp(AbstractKedroBootApp):
         return session.run()
 
 
-class DryRunApp(AbstractKedroBootApp):
+class CompileApp(AbstractKedroBootApp):
     """An App used to perform Dry Run.
 
     Args:
@@ -80,14 +91,3 @@ class DryRunApp(AbstractKedroBootApp):
 
     def _run(self, session: KedroBootSession) -> Any:
         pass
-
-
-class BridgeApp(AbstractKedroBootApp):
-    """An App used by the booter to pass the instantiated kedro boot session.
-
-    Args:
-        AbstractKedroBootApp (_type_): _description_
-    """
-
-    def _run(self, session: KedroBootSession) -> KedroBootSession:
-        return session

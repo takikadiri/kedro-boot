@@ -159,3 +159,5 @@ kedro.db
 .vscode/
 
 .ruff_cache/
+
+notebooks/

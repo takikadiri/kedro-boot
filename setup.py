@@ -52,7 +52,9 @@ setup(
             "jupyter>=1.0.0,<2.0.0",
         ],
     },
-    entry_points={"kedro.project_commands": ["boot =  kedro_boot.booter:commands"]},
+    entry_points={
+        "kedro.project_commands": ["boot =  kedro_boot.framework.cli.cli:commands"]
+    },
     keywords="kedro-plugin, framework, data apps, pipelines, machine learning, data pipelines, data science, data engineering, model serving, mlops, dataops",
     classifiers=[
         "Programming Language :: Python :: 3",
