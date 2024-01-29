@@ -73,12 +73,6 @@ def create_kedro_booter(
             **kedro_session_create_args,  # TODO: Make sure that this not take precedence over kedro_args. We should do some prior merging before kwarging
         ) as session:
             config_loader = session._get_config_loader()
-            config_loader._register_new_resolvers(
-                {
-                    "itertime_params": lambda variable,
-                    default_value=None: f"${{oc.select:{variable},{default_value}}}",
-                }
-            )
             if app:
                 runner = KedroBootAdapter(
                     app=app,
