@@ -52,9 +52,18 @@ setup(
             "pre-commit>=2.0.0,<4.0.0",
             "jupyter>=1.0.0,<2.0.0",
         ],
+        "fastapi": [
+            "fastapi>=0.100.0",
+            "gunicorn==21.2.0",
+            "pyctuator==0.18.1",
+        ],
     },
     entry_points={
-        "kedro.project_commands": ["boot =  kedro_boot.framework.cli.cli:commands"]
+        "kedro.project_commands": ["boot =  kedro_boot.framework.cli.cli:commands"],
+        "kedro_boot": ["fastapi = kedro_boot.app.fastapi.cli:fastapi_command"],
+        "kedro.hooks": [
+            "kedro_boot_hook = kedro_boot.framework.hooks:kedro_boot_hook",
+        ],
     },
     keywords="kedro-plugin, framework, data apps, pipelines, machine learning, data pipelines, data science, data engineering, model serving, mlops, dataops",
     classifiers=[

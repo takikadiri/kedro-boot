@@ -1,4 +1,4 @@
-"""A factory funtion for creating kedro boot session within external apps"""
+"""A factory funtion for creating kedro boot session within standalone apps"""
 
 from pathlib import Path
 from typing import List, Optional, Union
