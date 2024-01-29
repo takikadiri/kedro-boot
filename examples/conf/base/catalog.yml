@@ -1,0 +1,67 @@
+# Here you can define all your data sets by using simple YAML syntax.
+#
+# Documentation for this file format can be found in "The Data Catalog"
+# Link: https://kedro.readthedocs.io/en/stable/data/data_catalog.html
+#
+# The Data Catalog supports being able to reference the same file using two different DataSet implementations
+# (transcoding), templating and a way to reuse arguments that are frequently repeated. See more here:
+# https://kedro.readthedocs.io/en/stable/data/data_catalog.html
+
+companies:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/companies.csv
+  
+reviews:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/reviews.csv
+
+shuttles:
+  type: pandas.ExcelDataset
+  filepath: data/01_raw/shuttles.xlsx
+  load_args:
+    engine: openpyxl # Use modern Excel engine, it is the default since Kedro 0.18.0
+
+shuttles_artifacts:
+  type: pandas.ExcelDataset
+  filepath: data/01_raw/shuttles.xlsx
+  load_args:
+    engine: openpyxl
+
+# preprocessed_companies:
+#   type: pandas.ParquetDataSet
+#   filepath: data/02_intermediate/preprocessed_companies.pq
+
+# preprocessed_shuttles:
+#   type: pandas.ParquetDataSet
+#   filepath: data/02_intermediate/preprocessed_shuttles.pq
+
+features_store:
+  type: pandas.CSVDataset
+  filepath: data/04_feature/features_store.csv
+
+"{namespace}.features_store":
+  type: pandas.CSVDataset
+  filepath: data/04_feature/features_store.csv
+
+features:
+  type: pandas.CSVDataset
+  filepath: data/04_feature/features.csv
+
+# regressor:
+#   type: pickle.PickleDataSet
+#   filepath: data/06_models/regressor.pickle
+
+training.regressor:
+  type: pickle.PickleDataset
+  filepath: data/06_models/regressor.pickle
+
+evaluation.regression_score:
+  type: json.JSONDataset
+  filepath: data/07_model_output/regression_score_${itertime_params:eval_date}.json
+
+distances:
+  type: json.JSONDataset
+  filepath: data/03_primary/distances.json
+
+"{namespace}.distances":
+  type: MemoryDataset

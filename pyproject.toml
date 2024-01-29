@@ -1,5 +1,6 @@
 [tool.ruff]
 ignore = ["E501", "PLR0913", "PLR0911"]
+exclude = ["examples"]
 
 [tool.pytest.ini_options]
 addopts = "--cov=kedro_boot --cov-report=xml"
