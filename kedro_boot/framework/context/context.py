@@ -205,6 +205,11 @@ class KedroBootContext:
             Pipeline, DataCatalog: The rendered catalog
         """
 
+        if namespace not in self._namespaces_registry:
+            raise KedroBootContextError(
+                f"The given {namespace} namespace is not present in the current selected pipeline"
+            )
+
         inputs = inputs or {}
         parameters = parameters or {}
         itertime_params = itertime_params or {}
@@ -245,7 +250,6 @@ class KedroBootContext:
 
         pipeline = self._namespaces_registry.get(namespace).get("pipeline")
 
-        print(self._namespaces_registry.get("n1"))
         return pipeline, rendered_catalog
 
     def get_outputs_datasets(self, namespace: str) -> List[str]:

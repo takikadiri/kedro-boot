@@ -1,6 +1,9 @@
 import pytest
 from kedro.pipeline.modular_pipeline import pipeline
 from kedro.pipeline import Pipeline, node
+from cookiecutter.main import cookiecutter
+from kedro import __version__ as kedro_version
+from kedro.framework.startup import _add_src_to_path
 
 
 @pytest.fixture
@@ -23,19 +26,33 @@ def mock_pipeline() -> Pipeline:
     return pipeline(nodes)
 
 
-# @pytest.fixture
-# def mock_catalog() -> DataCatalog:
-#     dataset_a = MemoryDataSet(1)
-#     dataset_b = MemoryDataSet(2)
-#     dataset_c = MemoryDataSet(3)
-#     dataset_d = MemoryDataSet()
-#     dataset_e = CSVDataSet("test_data_${oc.select:date_param}.csv")
-#     catalog = DataCatalog(
-#         {"A": dataset_a, "B": dataset_b, "C": dataset_c, "D": dataset_d}
-#     )
-#     return catalog
+_FAKE_PROJECT_NAME = "fake_project"
 
 
-# @pytest.fixture
-# def mock_app_catalog(mock_catalog):
-#     return AppCatalog(mock_catalog)
+@pytest.fixture
+def kedro_project(tmp_path):
+    # TODO : this is also an integration test since this depends from the kedro version
+    config = {
+        # "output_dir": tmp_path,
+        "project_name": _FAKE_PROJECT_NAME,
+        "repo_name": _FAKE_PROJECT_NAME,
+        "python_package": _FAKE_PROJECT_NAME,
+        "kedro_version": kedro_version,
+        "tools": "['None']",
+        "example_pipeline": "True",
+    }
+
+    cookiecutter(
+        "https://github.com/kedro-org/kedro-starters.git",
+        directory="spaceflights-pandas",
+        output_dir=tmp_path,  # config["output_dir"],
+        no_input=True,
+        extra_context=config,
+        accept_hooks=True,
+    )
+
+    _add_src_to_path(
+        tmp_path / _FAKE_PROJECT_NAME / "src", tmp_path / _FAKE_PROJECT_NAME
+    )
+
+    return tmp_path / _FAKE_PROJECT_NAME
