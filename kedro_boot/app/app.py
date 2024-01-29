@@ -36,7 +36,7 @@ class AbstractKedroBootApp(ABC):
             catalog: The base ``DataCatalog`` from which to fetch data.
             hook_manager: The ``PluginManager`` to activate hooks.
             session_id: The id of the kedro session.
-            runtime_app_params (dict): params given by an App specific CLI
+            app_runtime_params (dict): params given by an App specific CLI
             config_loader (OmegaConfigLoader): kedro ``OmegaConfigLoader`` object
 
         Returns:
@@ -70,24 +70,15 @@ class AbstractKedroBootApp(ABC):
         pass
 
 
-class DummyApp(AbstractKedroBootApp):
-    """A Dummy app that do a simple run.
-    Using this app is equivalent to using kedro without kedro boot.
-
-    Args:
-        AbstractKedroBootApp (_type_): _description_
-    """
-
-    def _run(self, session: KedroBootSession) -> Any:
-        return session.run()
-
-
 class CompileApp(AbstractKedroBootApp):
-    """An App used to perform Dry Run.
-
-    Args:
-        AbstractKedroBootApp (_type_): _description_
-    """
+    """An App used to perform Dry Run."""
 
     def _run(self, session: KedroBootSession) -> Any:
         pass
+
+
+class BooterApp(AbstractKedroBootApp):
+    """An App used by the booter to pass the instantiated kedro boot session."""
+
+    def _run(self, session: KedroBootSession) -> KedroBootSession:
+        return session

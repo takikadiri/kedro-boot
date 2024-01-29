@@ -131,8 +131,6 @@ class CompilationSpec:
                         dataset_name.replace(f"{namespace}.", "")
                     )
 
-            print("HEEEERERERE")
-            print(compilation_spec.parameters)
             compilation_specs.append(compilation_spec)
 
         return compilation_specs

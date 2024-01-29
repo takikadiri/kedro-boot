@@ -1,1 +1,1 @@
-from .app import AbstractKedroBootApp, CompileApp  # noqa: F401
+from .app import AbstractKedroBootApp, CompileApp, BooterApp  # noqa: F401
