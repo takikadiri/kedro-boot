@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: Support dataset factories ([#5](https://github.com/takikadiri/kedro-boot/pull/5))
+- :sparkles: Allow declaring apps through project settings and CLIs ([#16](https://github.com/takikadiri/kedro-boot/pull/16))
+- :sparkles: Adding ``boot_project`` and ``boot_session`` allowing standalone apps to boot a session ([#17](https://github.com/takikadiri/kedro-boot/pull/17))
+
+### Changed
+
+- :boom: :arrow_up: Support kedro 0.19.x and drop support for 0.18.x ([#15](https://github.com/takikadiri/kedro-boot/pull/15))
+- :boom: Drop AppPipeline in favor of pipeline namespaces ([#14](https://github.com/takikadiri/kedro-boot/pull/14))
+- :boom: Adopt OmegaConfigLoader and replace Jinja ``template_params`` with ``itertime_params`` resolver ([#13](https://github.com/takikadiri/kedro-boot/pull/13))
+
 ## [0.1.0] - 2023-10-29
 
 ### Added
