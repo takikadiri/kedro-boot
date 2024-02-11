@@ -78,14 +78,14 @@ def predict(regressor: LinearRegression, features: pd.DataFrame):
     return predictions.tolist()
 
 
-def evaluate_model(predictions: pd.Series, labels: pd.Series):
+def evaluate_model(predictions: pd.Series, labels: pd.Series, r2_multioutput: str):
     """Calculates and logs the coefficient of determination.
 
     Args:
         predictions: predictions on a set of features.
         labels: Testing data for price (label).
     """
-    score = r2_score(labels, predictions)
+    score = r2_score(labels, predictions, multioutput=r2_multioutput)
     logger = logging.getLogger(__name__)
     logger.info("Model has a coefficient R^2 of %.3f on test data.", score)
     return {"regression_score": score}

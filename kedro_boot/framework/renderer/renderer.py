@@ -28,7 +28,7 @@ def render_template_datasets(
     )
     if remaining_catalog_tempate_params:
         LOGGER.warning(
-            f"The is not enough given iteration template param to render all the Template expressions. Template expressions are {set(template_params)} and the actual given template params are {set(iteration_template_params)}. Default values will be used if given in jinja expression '[[ expression | default('value') ]]' for {remaining_catalog_tempate_params}"
+            f"There is not enough given iteration template param to render all the Template expressions. Template expressions are {set(template_params)} and the actual given template params are {set(iteration_template_params)}. Default values will be used for {remaining_catalog_tempate_params}"
         )
 
     iteration_template_params_without_run_id = set(iteration_template_params) - {
@@ -207,18 +207,8 @@ def recursively_get_dataset_template_params(datasets: dict) -> List[str]:
     return template_params
 
 
-# env = Environment(
-#     block_start_string="[[%",
-#     block_end_string="%]]",
-#     variable_start_string="[[",
-#     variable_end_string="]]",
-#     comment_start_string="[[#",
-#     comment_end_string="#]]",
-# )
-
-
 def recursively_get_template_params(
-    dataset_attributes: Union[str, list, dict, PurePath]
+    dataset_attributes: Union[str, list, dict, PurePath],
 ) -> List[str]:
     if isinstance(dataset_attributes, str):
         config = OmegaConf.create({"dataset_entry": dataset_attributes})

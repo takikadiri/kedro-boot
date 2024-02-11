@@ -140,7 +140,7 @@ def compile_with_all_pipeline_outputs(
 
 
 def recursively_check_parametrized_values(
-    dataset_attributes: Union[str, list, dict, PurePath]
+    dataset_attributes: Union[str, list, dict, PurePath],
 ) -> bool:  # noqa: PLR0911
     """Helper that check if any of the dataset attributes is parametrized
 
@@ -208,4 +208,4 @@ def _check_if_dataset_is_param(dataset_name, specs_parameters) -> bool:
 
 
 class CatalogCompilerError(Exception):
-    """Error raised in AppCatalog compilation process"""
+    """Error raised in catalog compilation process"""
