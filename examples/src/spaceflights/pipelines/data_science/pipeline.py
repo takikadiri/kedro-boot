@@ -45,7 +45,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             node(
                 func=evaluate_model,
-                inputs=["predictions", "labels"],
+                inputs=["predictions", "labels", "params:r2_multioutput"],
                 outputs="regression_score",
                 name="evaluate_model",
             ),

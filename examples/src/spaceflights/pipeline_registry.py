@@ -79,11 +79,9 @@ def register_pipelines() -> Dict[str, Pipeline]:
     monte_carlo_pipelines = simulate_distance_pipeline + estimate_pi_pipeline
 
     return {
-        "__default__": all_data_science_pipelines,
-        "monte_carlo": monte_carlo_pipelines,
+        "__default__": inference_pipeline + evaluation_pipeline,
         "data_processing": data_processing_pipeline,
-        "data_science": all_data_science_pipelines,
         "training": training_pipeline,
-        "inference": inference_pipeline,
-        "evaluation": evaluation_pipeline,
+        "data_science": all_data_science_pipelines,
+        "monte_carlo": monte_carlo_pipelines,
     }

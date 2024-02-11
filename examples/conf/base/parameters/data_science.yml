@@ -33,3 +33,7 @@ inference.model_options:
     - iata_approved
     - company_rating
     - review_scores_rating
+
+
+training.r2_multioutput: uniform_average
+evaluation.r2_multioutput: uniform_average

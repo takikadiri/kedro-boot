@@ -1,8 +1,9 @@
 from typing import List
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
 from kedro_boot.app.fastapi import KedroFastApi
+
 
 app = FastAPI(title="Spaceflights shuttle price prediction")
 
@@ -30,5 +31,9 @@ def predictions(
 
 
 @app.get("/evaluate/{eval_date}", tags=["Evaluation"], operation_id="evaluation")
-async def run_evaluation_pipeline(eval_date: str, kedro_run: KedroFastApi):
+async def run_evaluation_pipeline(
+    eval_date: str,
+    kedro_run: KedroFastApi,
+    r2_multioutput: str = Query("uniform_average"),
+) -> dict:
     return kedro_run

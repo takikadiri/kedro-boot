@@ -102,7 +102,7 @@ class KedroBootSession:
             )
             self.compile()
 
-        pipeline, catalog = self._context.render(
+        pipeline, catalog, outputs_datasets = self._context.render(
             namespace=namespace,
             inputs=inputs,
             parameters=parameters,
@@ -110,9 +110,7 @@ class KedroBootSession:
         )
 
         iteration_outputs = self._runner.run(
-            pipeline=pipeline,
-            catalog=catalog,
-            outputs_datasets=self._context.get_outputs_datasets(namespace),
+            pipeline=pipeline, catalog=catalog, outputs_datasets=outputs_datasets
         )
 
         LOGGER.info(f"Iteration {iteration_run_id} completed")

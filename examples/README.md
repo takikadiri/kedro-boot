@@ -6,7 +6,7 @@ _It is 2160, and the space tourism industry is booming. Globally, thousands of s
 
 Project: You want to construct a model that predicts the price for each trip to the Moon and the corresponding return flight. The model need to be deployed in a REST API and in a Data App.
 
-In addition, this project offers a bonus tutorial on using [Kedro Boot](https://github.com/takikadiri/kedro-boot) to conduct a Monte Carlo simulation for estimating Pi and tracking the simulation's progress using [kedro-mlflow](https://github.com/Galileo-Galilei/kedro-mlflow) hooks.
+In addition, this project offers a bonus tutorial on using [Kedro Boot](https://github.com/takikadiri/kedro-boot) to conduct a Monte Carlo simulation for estimating Pi
 
 If you're new to [kedro](https://github.com/kedro-org/kedro), we invite you to visit [kedro docs](https://docs.kedro.org/en/stable/)
 
@@ -15,7 +15,7 @@ If you're new to [kedro](https://github.com/kedro-org/kedro), we invite you to v
 To install the project and its dependencies, run pip install command in a virtual environment :
 
 ```
-pip install src/.
+pip install .
 ````
 
 ## Data preparation and model training
@@ -34,22 +34,25 @@ kedro run --pipeline training
 
 ## Model deployment
 
-In order to use kedro pipelines into an kedro boot application. We need to registrer an ``AppPipeline`` by using ``app_pipeline`` factory.  
-Here we register an ``AppPipeline`` containing inference and evaluation pipelines
+In order to expose your kedro pipelines to a kedro boot application, you need to create namespaced pipelines. All namespaced datasets of the pipeline (inputs, outputs, parameters) will be exposed to the app. 
 
 ```python
-# create inference and evaluation app pipeline with an applicatif view on top of them
-inference_app_pipeline = app_pipeline(
-    inference_pipeline,
-    name="inference",
-    inputs="features_store",
-    artifacts="training.regressor",
-    outputs="inference.predictions",
+# create inference namespace. All the inference pipeline's datasets will be exposed to the app, except "regressor" and "model_options.
+inference_pipeline = pipeline(
+    [features_nodes, prediction_nodes],
+    inputs={"regressor": "training.regressor"},
+    parameters="model_options",
+    namespace="inference",
 )
-evaluation_app_pipeline = app_pipeline(evaluation_pipeline, name="evaluation")
+# create evaluation namespace. All the evaluation pipeline's datasets will be exposed to the app, except "feature_store", "regressor" and "model_options.
+evaluation_pipeline = pipeline(
+    [model_input_nodes, prediction_nodes, evaluation_nodes],
+    inputs={"features_store": "features_store", "regressor": "training.regressor"},
+    parameters="model_options",
+    namespace="evaluation",
+)
 
-# concatenate spaceflights app pipelines
-spaceflights_app_pipelines = inference_app_pipeline + evaluation_app_pipeline
+spaceflights_app_pipelines = inference_pipeline + evaluation_pipeline
 
 return {"__default__": spaceflights_app_pipelines}
 ```
@@ -71,7 +74,7 @@ Then go to http://localhost:8000/docs for trying out your FastAPi App.
 
 ![fastapi](.github/fastapi.png)
 
-The uvicorn (web server) args can be updated using conf/base/fastapi.yml
+The uvicorn or gunicorn (web server) args can be updated using conf/base/fastapi.yml
 
 ### Data App with Streamlit
 
@@ -90,7 +93,7 @@ You can try the app by modifying the shuttle features and calculating the associ
 
 ## Bonus example : Monte Carlo Simulation
 
-In this example we'll estimate Pi using monte carlo simulation. This demonstrates how to utilize [Kedro Boot](https://github.com/takikadiri/kedro-boot) in a [dynamic pipeline](https://github.com/kedro-org/kedro/issues/2627) scenario. The monte carlo app perform multiple pipeline runs and compose the pipelines dynamically at runtime.
+In this example we'll estimate Pi using monte carlo simulation. This demonstrates how to utilize [Kedro Boot](https://github.com/takikadiri/kedro-boot) in a dynamic pipeline scenario. The monte carlo app perform multiple pipeline runs and compose the pipelines dynamically at runtime.
 
 You can configure the app using ``conf/base/monte_carlo.yml`` and start it by running : 
 
@@ -98,11 +101,7 @@ You can configure the app using ``conf/base/monte_carlo.yml`` and start it by ru
 kedro boot --app monte_carlo_pi.app.MonteCarloApp --pipeline monte_carlo
 ```
 
-You can disable logs using logging.yml to speed up simulation.  
-
-[kedro-mlflow](https://github.com/Galileo-Galilei/kedro-mlflow) hooks is used under the hood to track Pi estimation at each iteration setp. You can start the UI by running ``kedro mlflow ui``
-
-![monte_carlo](.github/monte_carlo.png)
+You can disable logs using logging.yml to speed up simulation.
 
 
 

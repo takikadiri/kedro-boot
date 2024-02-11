@@ -74,12 +74,14 @@ class KedroBootContext:
 
             if given_namespaces - infered_namespaces:
                 raise KedroBootContextError(
-                    f"The given namespaces does not match with any of the pipeline namespaces. pipeline namespace are {infered_namespaces}, and the given namespaces are {given_namespaces}"
+                    f"The given namespaces {given_namespaces} does not match with any of the pipeline namespaces {infered_namespaces}."
                 )
             if given_namespaces != infered_namespaces:
                 LOGGER.warning(
-                    f"The given namespaces does not match with the pipeline namespaces. pipeline namespace are {infered_namespaces}, and the given namespaces are {given_namespaces}"
+                    f"The given namespaces {given_namespaces} does not match with the pipeline namespaces {infered_namespaces}."
                 )
+
+            # TODO: We should also check if the given spec (inputs, outputs, parameters) are included in infered specs attributes
 
         else:
             LOGGER.info(
@@ -158,10 +160,7 @@ class KedroBootContext:
             )
 
             self._namespaces_registry[compilation_spec.namespace] = dict(
-                pipeline=pipeline,
-                catalog=catalog_assembly,
-                outputs=compilation_spec.namespaced_outputs,
-                inputs=compilation_spec.inputs,
+                pipeline=pipeline, catalog=catalog_assembly, spec=compilation_spec
             )
 
         LOGGER.info("Loading artifacts datasets as MemoryDataset ...")
@@ -199,7 +198,7 @@ class KedroBootContext:
         inputs: Optional[dict] = None,
         parameters: Optional[dict] = None,
         itertime_params: Optional[dict] = None,
-    ) -> Tuple[Pipeline, DataCatalog]:
+    ) -> Tuple[Pipeline, DataCatalog, List[str]]:
         """Generate a (pipeline, catalog) by rendering a namespace registry using the provided App Data.
 
         Args:
@@ -257,7 +256,9 @@ class KedroBootContext:
 
         pipeline = self._namespaces_registry.get(namespace).get("pipeline")
 
-        return pipeline, rendered_catalog
+        outputs_datasets_name = list(output_datasets.keys())
+
+        return pipeline, rendered_catalog, outputs_datasets_name
 
     def get_outputs_datasets(self, namespace: str) -> List[str]:
         return self._namespaces_registry.get(namespace).get("outputs")
@@ -287,4 +288,4 @@ def namespace_datasets(iteration_datasets: dict, namespace: str = None) -> dict:
 
 
 class KedroBootContextError(Exception):
-    """Error raised in AppCatalog operations"""
+    """Error raised in kedro boot context operations"""

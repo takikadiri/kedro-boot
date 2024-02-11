@@ -4,6 +4,7 @@ import threading
 import typing
 import uuid
 
+
 try:  # For backward compatibility with python 3.8
     from typing import Annotated
 except ImportError:
@@ -27,9 +28,11 @@ class KedroFastApiSession:
         namespace = request.scope["route"].operation_id
         datasets = {}
 
-        # TODO: We should get pipeline inputs and outputs from CompilationSpec instead. We should persist it after compilation.
+        # TODO: We should get pipeline inputs and outputs from KedroFastApi session instead of KedroBootSession. We should persist it after compilation.
 
-        pipeline_inputs = self.session._context.get_inputs_datasets(namespace)
+        pipeline_inputs = (
+            self.session._context._namespaces_registry.get(namespace).get("spec").inputs
+        )
 
         if pipeline_inputs:
             datasets = await request.json()
@@ -39,7 +42,11 @@ class KedroFastApiSession:
         run_id = uuid.uuid4().hex
         itertime_params.update({"run_id": run_id})
 
-        pipeline_outputs = self.session._context.get_outputs_datasets(namespace)
+        pipeline_outputs = (
+            self.session._context._namespaces_registry.get(namespace)
+            .get("spec")
+            .namespaced_outputs
+        )
         if (
             inspect.iscoroutinefunction(request.scope["endpoint"])
             and not pipeline_outputs
@@ -84,6 +91,13 @@ class KedroFastApiSession:
                 if managed_endpoints:
                     compilation_specs_inputs = []
                     compilation_specs_outputs = []
+                    compilation_specs_parameters = []
+
+                    query_params = extract_query_params_from_endpoint(
+                        app, route.path, list(route.methods)
+                    )
+                    for query_param in query_params:
+                        compilation_specs_parameters.append(query_param["name"])
 
                     for (
                         param_name,
@@ -125,6 +139,7 @@ class KedroFastApiSession:
                             namespace=route.operation_id,
                             inputs=compilation_specs_inputs,
                             outputs=compilation_specs_outputs,
+                            parameters=compilation_specs_parameters,
                         )
                     )
 
@@ -137,3 +152,22 @@ KedroFastApi = Annotated[dict, Depends(kedro_fastapi_session)]
 
 class KedroFastApiSessionError(Exception):
     """Error raised in catalog rendering operations"""
+
+
+def extract_query_params_from_endpoint(
+    app: FastAPI, path: str, methods: typing.List[str]
+):
+    openapi_schema = app.openapi()
+    paths = openapi_schema.get("paths", {})
+
+    query_params = []
+
+    path_item = paths.get(path, {})
+    for method in methods:
+        operation = path_item.get(method.lower(), {})
+        parameters = operation.get("parameters", [])
+        for param in parameters:
+            if param["in"] == "query":
+                query_params.append(param)
+
+    return query_params
