@@ -57,6 +57,25 @@ spaceflights_app_pipelines = inference_pipeline + evaluation_pipeline
 return {"__default__": spaceflights_app_pipelines}
 ```
 
+### Rest API with Kedro FastAPI Server
+
+The FastApi app run inside the [Kedro FastAPI Server](../README.md#consuming-kedro-pipeline-through-rest-api). It serves two endpoints:
+
+- /predict : take the shuffle features, run the inference pipeline and get the prediction results
+- /evaluate : trigger the evaluation pipeline, while injecting eval_date as path parameter and r2_multioutput as query parameter. at each run it save the evaluation results in ``data/07/model_output/regression_score_${itertime_params:eval_date}.json`` eval_date is mapped to the itertime_params and r2_multioutput is mapped to kedro parameters
+
+You can start your FastAPI App with
+
+```
+kedro boot fastapi --app spaceflights_kedro_fastapi.app.app
+```
+
+Then go to http://localhost:8000/docs for trying out your FastAPI App.
+
+![fastapi](.github/fastapi.png)
+
+The gunicorn or uvicorn (web server) args can be updated using conf/base/fastapi.yml
+<!-- 
 ### Rest API with FastAPI
 
 The FastApi app is integrated into kedro project in an [embedded mode](https://github.com/takikadiri/kedro-boot#embedded-mode--model-serving-with-fastapi). It serve two endpoints :
@@ -74,11 +93,11 @@ Then go to http://localhost:8000/docs for trying out your FastAPi App.
 
 ![fastapi](.github/fastapi.png)
 
-The uvicorn or gunicorn (web server) args can be updated using conf/base/fastapi.yml
+The uvicorn or gunicorn (web server) args can be updated using conf/base/fastapi.yml -->
 
-### Data App with Streamlit
+### Data App with Streamlit (Standalone mode)
 
-The Streamlit app consume kedro project in a [standalone mode](https://github.com/takikadiri/kedro-boot#standalone-mode--data-app-with-streamlit).
+The Streamlit app consume kedro pipeline in a [standalone mode](../README.md#standalone-mode-the-application-hold-the-entry-point).
 
 You can start the Streamlit App by running : 
 
@@ -91,9 +110,10 @@ You can try the app by modifying the shuttle features and calculating the associ
 
 ![streamlit](.github/streamlit.png)
 
-## Bonus example : Monte Carlo Simulation
+## Monte Carlo Simulation (Embeded mode)
 
-In this example we'll estimate Pi using monte carlo simulation. This demonstrates how to utilize [Kedro Boot](https://github.com/takikadiri/kedro-boot) in a dynamic pipeline scenario. The monte carlo app perform multiple pipeline runs and compose the pipelines dynamically at runtime.
+The Monte Carlo App consume kedro pipeline in an [embeded mode](../README.md#embedded-mode--the-application-is-embeded-inside-kedro-project).
+In this example we'll estimate Pi using monte carlo simulation. This demonstrates how to utilize [Kedro Boot](https://github.com/takikadiri/kedro-boot) in a dynamic pipeline scenario. The monte carlo app perform multiple pipeline runs and merge their results to calculate Pi.
 
 You can configure the app using ``conf/base/monte_carlo.yml`` and start it by running : 
 

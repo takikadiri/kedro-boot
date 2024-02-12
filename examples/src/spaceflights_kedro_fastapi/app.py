@@ -23,7 +23,7 @@ class ShuttlePrediction(BaseModel):
     shuttles_prices: List[float]
 
 
-@app.post("/inference", tags=["Inference"], operation_id="inference")
+@app.post("/predict", tags=["Inference"], operation_id="inference")
 def predictions(
     features_store: ShuttleFeature, kedro_run: KedroFastApi
 ) -> ShuttlePrediction:

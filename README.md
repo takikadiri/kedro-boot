@@ -1,216 +1,234 @@
 ![Kedro Boot Logo - Ligh](.github/logo_light.png#gh-light-mode-only)
 ![Kedro Boot Logo - Dark](.github/logo_dark.png#gh-dark-mode-only)
-[![Python version](https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg)](https://pypi.org/project/kedro/)
+[![Python version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg)](https://pypi.org/project/kedro/)
 [![PyPI version](https://badge.fury.io/py/kedro-boot.svg)](https://badge.fury.io/py/kedro-boot)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/takikadiri/kedro-boot/blob/main/LICENSE)
 [![Powered by Kedro](https://img.shields.io/badge/powered_by-kedro-ffc900?logo=kedro)](https://kedro.org)
 
 # What is kedro-boot ?
-Kedro Boot is a [kedro plugin](https://docs.kedro.org/en/stable/extend_kedro/plugins.html) that streamlines the integration between Kedro projects and external applications. It offers a framework for seamlessly interacting with kedro's pipeline and catalog. This include features like injecting application's data into kedro catalog and dynamically orchestrating multiple kedro pipeline runs.
+Kedro Boot makes it simple to integrate your Kedro pipelines with any applications. It's a framework for creating APIs and SDKs for you kedro projects.
+It offers these key functionalities: 
 
-This enable using Kedro pipelines in a wide range of online and low latency use cases, including model serving, data apps (streamlit, dash), statistical simulations, paralell processing of unstructured data, streaming, and more.
+- Data injection: Streamline the process of feeding data from any application into Kedro pipelines
+- Low-Latency Execution: Execute multiple pipeline runs with minimal delay, optimising for time-sensitive web applications.
+
+This enable using Kedro pipelines in a wide range of use cases, including model serving, data apps (streamlit, dash), statistical simulations, paralell processing of unstructured data, streaming, and more.  It also streamline the deployment of your Kedro pipeline into various Data & AI Platforms
 
 _If you're new to [kedro](https://github.com/kedro-org/kedro), we invite you to visit [kedro docs](https://docs.kedro.org/en/stable/)_
 
-# How do I install Kedro Boot ?
+# How do I use Kedro Boot ?
 
-``kedro-boot`` is available on PyPI, so you can install it with pip:
+Any application can consume kedro pipelines through REST APIs or as a library (SDK). Kedro Boot provides utilities and abstractions for each of these integration patterns
+
+## Consuming Kedro pipeline through REST API
+
+You can serve your kedro pipelines as a REST API using Kedro FastAPI Server
+
+First you should install kedro-boot with fastapi extra dependency
+```
+pip install kedro-boot[fastapi]
+````
+
+Then you can serve your fastapi app with :
 
 ```
-pip install kedro-boot
+kedro boot fastapi --app path.to.your.fastapi.app <kedro_args>
 ```
 
-Kedro Boot requires Kedro version 0.18.1 or higher and has Kedro as its only dependency
+Your fastapi app objects will be mapped with kedro pipeline objects, and the run results will be injected into your KedroFastAPI object through [FastAPI dependency injection](https://fastapi.tiangolo.com/tutorial/dependencies/). Here is an illustration of the kedro <-> fastapi objects mapping: 
 
-# How do I use Kedro Boot ? 
+![Kedro FastAPI objects mapping](.github/kedro_fastapi_mapping.PNG)
 
-Kedro Boot provides utilities and abstractions for registering application pipelines and implementing Kedro Boot apps. In the following section, we'll guide you through an example that demonstrates how to use Kedro Boot in a model serving scenario. This example will help you grasp Kedro Boot's interface and concepts as we show you how to register an inference pipeline and use it in two model serving deployment patterns: a REST API with FastAPI and a Data App with Streamlit.
+A default FastAPI app is used if no FastAPI app given. It would serve a single endpoint that run your selected pipeline
 
-## Registring the application pipeline
+```
+kedro boot fastapi
+```
 
-To register an application pipeline, you need to create an ``AppPipeline`` in the ``pipeline_registry`` using ``app_pipeline`` factory : 
+These production-ready features would be natively included in your FastAPI apps:
 
-pipeline_registry.py
+- Embeded [Gunicron web server](https://gunicorn.org/) (only for linux and macos)
+- [Pyctuator](https://github.com/SolarEdgeTech/pyctuator) that report some service health metrology and application states. Usually used by service orchestrators (kubernetes) or monitoring to track service health and ensure it's high availability
+- Multiple environments configurations, leveraging kedro's OmegaConfigLoader. ``["fastapi*/"]`` config pattern could be used to configure the web server. Configs could also be passed as CLI args (refer to --help)
+
+You can refer to the spaceflights [Kedro FastAPI examples](examples/src/spaceflights_kedro_fastapi/app.py) that showcases serving multiples endpoints operations that are mapped to differents pipeline namespaces
+
+
+## Consuming Kedro pipelines through SDK
+
+Any python applications could consume kedro pipeline as a library. The integration process involves two steps:
+
+- Registring kedro pipeline
+- Creating a Kedro Boot Session
+
+### Registring Kedro pipelines
+
+Kedro Boot prepare the catalog for the application consumption through a compilation process that follow a compilation specs. 
+
+Compilation specs defines the namespaces and their datasets (inputs, outputs, parameters) that would be exposed to the application. It specify also if artifacts datasets should be infered during the compilation process (*artifacts datasets are loaded in MemoryDataset at runtime in order to speed up iteration time*)
+
+The compilation specs are either given by the Application or infered from the Kedro Pipeline. 
+
+Here is an example of registring a pipeline that contains inference and evaluation namespaces. 
+
 ```python
-from kedro_boot.pipeline import app_pipeline
+# create inference namespace. All the inference pipeline's datasets will be exposed to the app, except "regressor" and "model_options.
+inference_pipeline = pipeline(
+    [features_nodes, prediction_nodes],
+    inputs={"regressor": "training.regressor"},
+    parameters="model_options",
+    namespace="inference",
+)
+# create evaluation namespace. All the evaluation pipeline's datasets will be exposed to the app, except "feature_store", "regressor" and "model_options.
+evaluation_pipeline = pipeline(
+    [model_input_nodes, prediction_nodes, evaluation_nodes],
+    inputs={"features_store": "features_store", "regressor": "training.regressor"},
+    parameters="model_options",
+    namespace="evaluation",
+)
 
-app_inference_pipeline = app_pipeline(
-        inference_pipeline,
-        name="inference",
-        inputs="features_store",
-        artifacts="training.regressor",
-        outputs="inference.predictions",
-    )
+spaceflights_pipelines = inference_pipeline + evaluation_pipeline
 
-return {"__default__": app_inference_pipeline}
+return {"__default__": spaceflights_pipelines}
 ```
 
-Here the ``app_pipeline`` take a Kedro ``Pipeline`` and define an applicatif view on top of it. The ``AppPipeline`` will be used to compile the ``AppCatalog``, making it ready for the iteractions with the Kedro Boot app. Below are the different categories of datasets in the ``AppCatalog``.
+In this example, all the namespaces and their namespaced datasets (inputs, outputs, parameters) would infer compilation specs and therefore would be exposed to the Application. 
 
-- Inputs: inputs datasets that will be injected by the app at iteration time.
+You can use kedro-viz to visualize the datasets that woulc be exposed to the kedro boot apps. In the figure below, we see clearly that ``inference.feature_store`` and ``inference.predictions`` will be exposed to the applicaton (the blue one).
+
+![pipeline_namespace](.github/pipeline_namespace.png)
+
+Below are the different categories of datasets that forms the compiled catalog.
+
+- Inputs: inputs datasets that are be injected by the app at iteration time.
 - Outputs: outputs dataset that hold the run results.
-- Parameters: parameters that will be injected by the app at iteration time.
-- Artifacts: artifacts datasets that will be materialized (loaded as MemoryDataset) at startup time.
-- Templates: template datasets that contains jinja expressions in this form "[[ expression ]]". These templates will be rendered by the app template_params at iteration time
+- Parameters: parameters that are injected by the app at iteration time.
+- Artifacts: artifacts datasets that are materialized (loaded as MemoryDataset) at startup time.
+- Templates: template datasets that contains ${itertime_params: param_name}. Their attributes are interpolated at iteration time. 
 
-You can perform a dry run to compile the ``AppCatalog`` without actually using it in a Kedro Boot app. This is helpful when letting the ``app_pipeline`` automatically infer artifact datasets or to verify if the template datasets are correctly detected.
+You can compile the catalog without actually using it in a Kedro Boot App. This is helpful for verifying if the expected artifacts datasets are correctly infered or if the template datasets are correctly detected.
 
 ```
-kedro boot --dry-run
+kedro boot compile
 ```
 Compilation results:
 ```
-INFO  catalog compilation completed for the pipeline view 'inference'. Here is the report:                                                          
-        - Input datasets to be replaced/rendered at iteration time: {'features_store'}
-        - Output datasets that hold the results of a run at iteration time: {'inference.predictions'}
-        - Parameter datasets to be replaced/rendered at iteration time: set()
-        - Artifact datasets to be materialized (preloader as memory dataset) at startup time: {'training.regressor'}
-        - Template datasets to be rendered at iteration time: set()
+INFO  catalog compilation completed for the namespace 'inference'. Here is the report:                                                          
+    - Input datasets to be replaced/rendered at iteration time: {'inference.features_store'}
+    - Output datasets that hold the results of a run at iteration time: {'inference.predictions'}
+    - Parameter datasets to be replaced/rendered at iteration time: set()
+    - Artifact datasets to be materialized (preloader as memory dataset) at startup time: {'training.regressor'}
+    - Template datasets to be rendered at iteration time: set()
 		
 INFO  Catalog compilation completed.           
 ```
 
-## Implementing and integrating the application
+We can see that the ``training.regressor`` is beign infered as artifact, it will be loaded as memory dataset to speed up iterations and prevent memory leak in a web app use case.
 
-There is two way of integrating an application with Kedro using Kedro Boot. In both approaches, Kedro Boot create a ``KedroBootSession`` for the application to manage it's interactions with kedro project.
+Note that when infering compilation specs, a pipeline that have no namespaces is also exposed to the kedro boot apps (have a compilation spec), but does not expose any datasets. Applications could provide their own compilation specs in order to specify the datasets that are needed to be exposed.
 
-### Embedded mode : Model serving with FastApi 
+### Creating Kedro Boot Session
+
+The Kedro Boot Session could be created from within an external application using ``boot_project`` or ``boot_package`` factories, or it can be created inside the kedro project using the ``AbstractKedroBootApp`` in the case of an embeded application.  
+
+
+#### Standalone mode: The application hold the entry point
+
+This refer to applications that have their own CLI entry points and cannot be embeded in kedro's entry point. Streamlit and Data & AI Platforms are an example of such applications.
+
+These application could create a Kedro Boot Session from kedro project or kedro package, using ``boot_project`` or ``boot_package``
+
+```python
+from kedro_boot.app.booter import boot_project
+from kedro_boot.app.booter import boot_package
+from kedro_boot.framework.compilation.specs import CompilationSpec
+
+session = boot_project(
+    project_path="<your_project_path>",
+    compilation_specs=[CompilationSpec(inputs=["your_dataset_name"])], # Would be infered if not given
+    kedro_args={ # kedro run args
+        "pipeline": "your_pipeline",
+        "conf_source": "<your_conf_source>",
+    },
+)
+
+# session = boot_package(
+#     package_name="<your_package_name>",
+#     compilation_specs=[CompilationSpec(inputs=["your_dataset_name"])],
+#     kedro_args={
+#         "pipeline": "your_pipeline",
+#         "conf_source": "<your_conf_source>",
+#     },
+# )
+
+run_results = session.run(inputs={"your_dataset_name": your_data})
+```
+
+You can found a complete example of a steamlit app that serve an ML model in the [Kedro Boot Examples](examples) project. We invite you to test it to gain a better understanding of Kedro Boot's ``boot_project`` or ``boot_package`` interfaces
+
+### Embedded mode : The application is embeded inside kedro project
 
 This mode involves using Kedro Boot to embed an application inside a Kedro project, leveraging kedro's entry points, session and config loader for managing application lifecycle. It's suitable for use cases when the application is lightweight and owned by the same team that developed the kedro pipelines.
 
-Here, we present an example of low-latency model serving using a FastAPI app as a Kedro Boot App. We serve an entire Kedro pipeline, including not just the model artifact, but also any preprocessing and postprocessing steps typically included within the prediction endpoints. 
-As the model dataset has been registered as an artifact, it will be materialized/loaded as a MemoryDataset at catalog compilation time to optimize inference speed.
+An embedded Kedro Boot App is an implementation of the ``AbstractKedroBootApp``. The kedro Boot Session is provided through the ``_run`` abstractmethod. 
+
 ```python
-from datetime import datetime
-import uvicorn
-from fastapi import FastAPI
-from pydantic import BaseModel
 from kedro_boot.app import AbstractKedroBootApp
-from kedro_boot.session import KedroBootSession
+from kedro_boot.framework.session import KedroBootSession
 
 
-class FastApiApp(AbstractKedroBootApp):
-    def _run(self, kedro_boot_session: KedroBootSession) -> None:
+class KedroBootApp(AbstractKedroBootApp):
+    def _run(self, kedro_boot_session: KedroBootSession):
+        # leveraging config_loader to manage app's configs
+        my_app_configs = kedro_boot_session.config_loader[
+            "my_app"
+        ]  # You should delcare this config pattern in settings.py
 
-        # Create fastapi app
-        fastapi_app = fastapi_app_factory(kedro_boot_session)
-
-        # A kedro boot apps leverage config_loader to manage it's configs
-        fastapi_args = kedro_boot_session.config_loader.get("fastapi.yml")
-
-        uvicorn.run(fastapi_app, **fastapi_args)
-
-
-def fastapi_app_factory(kedro_boot_session: KedroBootSession) -> FastAPI:
-    # Create an instance of the FastAPI class
-    app = FastAPI(title="Spaceflight shuttle Price prediction")
-
-    # Define a Pydantic model for Shuttle Feature
-    class ShuttleFeature(BaseModel):
-        engines: int = 2
-        passenger_capacity: int = 5
-        crew: int = 5
-        d_check_complete: bool = False
-        moon_clearance_complete: bool = False
-        iata_approved: bool = False
-        company_rating: float = 0.95
-        review_scores_rating: int = 88
-
-    # Create a POST endpoint to receive shuttle features JSON data
-    @app.post("/predict")
-    def predict_shutlle_price(shuttle_features: ShuttleFeature):
-
-        shuttle_price = kedro_boot_session.run(
-            name="inference", inputs={"features_store": shuttle_features.dict()}
-        )
-        return shuttle_price.tolist()
-
-    return app
+        for _ in my_app_configs.get("num_iteration"):  # Doing mutliples pipeline runs
+            kedro_boot_session.run(
+                namespace="my_namespace",
+            )
 ```
 
-An embedded Kedro Boot app is an implementation of the ``AbstractKedroBootApp``. In this implementation, we define the ``_run`` method, which involves creating the FastAPI app, retrieving configurations using the config_loader, and then launching the Uvicorn web server.
+The Kedro Boot App could be declared either in kedro's settings or as Kedro Boot run CLI args
 
-The FastAPI app utilizes the ``KedroBootSession`` to perform runs on the inference pipeline, injecting data and retrieving outputs at each run iteration.
-
-Here is the command to run a kedro boot app. You can refer to ``--help`` for more options details
-
-```
-kedro boot --app <package_name>.<module_name>.FastApiApp
-```
-
-You can found the complete example code in the [Kedro Boot Examples](https://github.com/takikadiri/kedro-boot-examples) repo. We invite you to test it to gain a better understanding of Kedro Boot
-
-### Standalone mode : Data App with Streamlit	
-This mode refers to using Kedro Boot in an external application that has its own entry point. It's suitable for scripting apps that need their own runner tool or for large application that already exist before the kedro project, and may have been developed by a different team.
-
+- Declaring Kedro Boot App through settings.py
 ```python
-import pandas as pd
-import streamlit as st
-from kedro_boot.booter import boot_session
+from your_package.your_module import KedroBootApp
 
-kedro_boot_session = boot_session()
-
-st.title("Spaceflight shuttle Price prediction")
-
-with st.container():
-    with st.form("my_form"):
-        st.write("Shuttle Price Prediction")
-        shuttle = {
-            "engines": st.slider("engines", 0, 12, 2),
-            "passenger_capacity": st.slider("passenger_capacity", 1, 20, 5),
-            "crew": st.slider("crew", 0, 20, 5),
-            "d_check_complete": st.checkbox("d_check_complete"),
-            "moon_clearance_complete": st.checkbox("moon_clearance_complete"),
-            "iata_approved": st.checkbox("iata_approved"),
-            "company_rating": st.slider("company_rating", 0.0, 1.0, 0.95),
-            "review_scores_rating": st.slider("review_score_rating", 20, 100, 88),
-        }
-
-        submitted = st.form_submit_button("Predict Price")
-
-if submitted:
-    shuttle_df = pd.DataFrame(shuttle, index=[0])
-    # Running inference app_pipeline
-	shuttle_price = kedro_boot_session.run(
-        name="inference", inputs={"features_store": shuttle_df}
-    )
-    shuttle_price = shuttle_price.tolist()
-    formated_shuttle_price = round(shuttle_price[0], 3)
-
-    st.success(f"The predicted shuttle price is {formated_shuttle_price} $")
-
+APP_CLASS = KedroBootApp
+APP_ARGS = {} # Any class init args
 ```
 
-A Standalone app uses ``boot_session`` to create a ``KedroBootSession`` within the app. The app then leverages the ``KedroBootSession`` to perform multiple ``AppPipeline`` runs, similar to the embedded mode.
-
-This streamlit app own the entry point, so we can start the app by : 
+The Kedro Boot App could be started with:
 
 ```
-streamlit run /path/to/streamlit_app/script.py
+kedro boot run <kedro_run_args>
+````
+
+- Declaring Kedro Boot App through kedro boot run CLI (Take precedence)
+
 ```
+kedro boot run --app path.to.your.KedroBootApp <kedro_run_args>
+````
 
-Note that in this example, we don't provide any arguments to ``boot_session``. By default, it expects the current working directory to point to a Kedro project. If the Kedro project is located elsewhere, you can pass the ``project_path`` to ``boot_session`` to help it locate the Kedro project. Additionally, you can pass additional arguments for Kedro session creation and running. For more details, please refer to the ``boot_session`` docstring
+You can fnd two examples of using the embeded mode in the [Kedro Boot Examples](examples) project
 
-You can found the complete example code in the [Kedro Boot Examples](https://github.com/takikadiri/kedro-boot-examples) repo. We invite you to test it to gain a better understanding of Kedro Boot
-
-The [Kedro Boot Examples](https://github.com/takikadiri/kedro-boot-examples) repo contains also an example of monte carlo simulation for Pi estimation, showing a way to dynamically compose/orchestrate kedro pipelines at runtime, while using [kedro-mlflow](https://github.com/Galileo-Galilei/kedro-mlflow) hooks to track simulation's metrics
 
 ## Why does Kedro Boot exist ?
 
 Kedro Boot unlock the value of your kedro pipelines by giving you a structured way for integrating them in a larger application. We developed kedro-boot to achieve the following : 
 
-- Streamline deployment of kedro pipelines in a non-batch world : web services (Rest API, Data apps, ...), streaming, HPC
-- Encourage reuse and prevent rewriting pipeline's logic from the team that own the front application
+- Streamline deployment of kedro pipelines in batch, streaming and web app context.
+- Encourage reuse and prevent rewriting pipeline's logic by the team that own the front application
 - Leverage kedro's capabilities for business logic separation and authoring
-- Leverage kedro's capabilities for managing application lifecycle
+- Leverage kedro's capabilities for managing an application lifecycle
 
-Kedro Boot apps utilize Kedro's pipeline as a means to construct and manage business logic. Kedro's underlying principles and internals ensure the maintainability, clarity, reuse, and visibility (kedro-viz) of business logic within Kedro Boot apps, thanks to Kedro's declarative nature.
-
-While Kedro Boot apps adopts the declarative approach for handling its business logic through kedro pipelines, they opt for an explicit and imperative approach for orchestrating and utilizing those pipelines. This choice allows for a wide range of use cases. We believe that this blend of declarative and imperative approaches through Kedro Boot can enable the development of end-to-end production-ready data science applications.
+Kedro Boot apps utilize Kedro's pipeline as a means to construct and manage business logic and some part or I/O. Kedro's underlying principles and internals ensure the maintainability, clarity, reuse, and visibility (kedro-viz) of business logic within Kedro Boot Apps, thanks to Kedro's declarative nature.
 
 ## Where do I test Kedro Boot ?
 
-You can refer to the [Kedro Boot Examples](https://github.com/takikadiri/kedro-boot-examples) repository; it will guide you through three examples of Kedro Boot usages.
+You can refer to the [Kedro Boot Examples](examples) project; it will guide you through four examples of Kedro Boot usages.
 
 ## Can I contribute ?
 

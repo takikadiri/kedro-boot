@@ -26,7 +26,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/takikadiri/kedro-boot",
     author="Takieddine Kadiri",
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     packages=find_packages(exclude=["docs", "tests"]),
     include_package_data=True,
     install_requires=base_requirements,
