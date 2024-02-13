@@ -134,12 +134,18 @@ class KedroFastApiSession:
                             f"We cannot declare {route.endpoint.__name__} endpoint as async while waiting reponse data from pipeline's {compilation_specs_outputs} outputs. We gonna switch to sync mode"
                         )
 
+                    infer_artifacts = True
+                    # If only the KedroFastpi dependency that are present in the endpoint annotations, we can disable infering artifacts as the service will be exclusively used as trigger for the pipeline
+                    if len(route.endpoint.__annotations__) == 1:
+                        infer_artifacts = False
+
                     compilation_specs.append(
                         CompilationSpec(
                             namespace=route.operation_id,
                             inputs=compilation_specs_inputs,
                             outputs=compilation_specs_outputs,
                             parameters=compilation_specs_parameters,
+                            infer_artifacts=infer_artifacts,
                         )
                     )
 

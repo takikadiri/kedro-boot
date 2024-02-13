@@ -2,11 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: Include ["fastapi*/] dynamically in the config loader config patterns
+
+### Fixed
+
+- :bug: Catch fastapi extra dependecies errors, and make their imports lazy.
+
 ## [0.2.0] - 2024-02-12
 
 ### Added
 
--   :sparkles: Introduce Kedro FastAPI Server: A framework for building production-ready REST APIs using Kedro, FastAPI and Gunicorn.
+-   :sparkles: Introduce Kedro FastAPI Server: A framework for building production-ready REST APIs using Kedro, FastAPI and Gunicorn ([#18](https://github.com/takikadiri/kedro-boot/pull/18))
 -   :sparkles: Support dataset factories ([#5](https://github.com/takikadiri/kedro-boot/pull/5))
 -   :sparkles: Allow declaring apps through project settings and CLIs ([#16](https://github.com/takikadiri/kedro-boot/pull/16))
 -   :sparkles: Adding `boot_project` and `boot_package` allowing standalone apps to boot a session ([#17](https://github.com/takikadiri/kedro-boot/pull/17))

@@ -31,7 +31,6 @@ CONFIG_LOADER_ARGS = {
     "base_env": "base",
     "default_run_env": "local",
     "config_patterns": {
-        "fastapi": ["fastapi*/"],
         "monte_carlo": ["monte_carlo*/"],
     },
 }

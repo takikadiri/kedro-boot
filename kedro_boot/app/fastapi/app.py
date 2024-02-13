@@ -1,12 +1,9 @@
 import logging
 import platform
 
-import uvicorn
 from kedro.config import MissingConfigException
 from kedro.utils import load_obj
-from pyctuator.pyctuator import Pyctuator
 
-from kedro_boot.app.fastapi.session import KedroFastApiSession, kedro_fastapi_session
 from kedro_boot.app import AbstractKedroBootApp
 from kedro_boot.framework.session import KedroBootSession
 
@@ -35,8 +32,24 @@ class FastApiApp(AbstractKedroBootApp):
 
     def _run(self, kedro_boot_session: KedroBootSession):
         try:
+            import uvicorn
+            from pyctuator.pyctuator import Pyctuator
+            from kedro_boot.app.fastapi.session import (
+                KedroFastApiSession,
+                kedro_fastapi_session,
+            )
+        except (ImportError, ModuleNotFoundError) as e:
+            raise FastApiAppException(
+                f"{e.msg}. If you're using the Kedro FastAPI Server, you should consider installing fastapi extra dependencies 'pip install kedro-boot[fastapi]'"
+            )
+
+        kedro_boot_session.config_loader.config_patterns.update(
+            {"fastapi": ["fastapi*/"]}
+        )
+
+        try:
             server_file_options = kedro_boot_session.config_loader["fastapi"].get(
-                "server"
+                "server", {}
             )
         except MissingConfigException:
             LOGGER.warning(
@@ -102,3 +115,7 @@ class FastApiApp(AbstractKedroBootApp):
             )
 
             GunicornApp(app, configs).run()
+
+
+class FastApiAppException(Exception):
+    """Error raised in FastApiApp operations"""
