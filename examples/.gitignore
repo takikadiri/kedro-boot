@@ -19,6 +19,8 @@ data/**
 
 # keep also the example dataset
 !data/01_raw/*
+!data/04_feature/*
+!data/06_models/*
 
 
 ##########################

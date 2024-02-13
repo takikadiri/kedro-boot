@@ -32,17 +32,17 @@ pip install kedro-boot[fastapi]
 Then you can serve your fastapi app with :
 
 ```
-kedro boot fastapi --app path.to.your.fastapi.app <kedro_args>
+kedro boot fastapi --app path.to.your.fastapi.app <kedro_run_args>
 ```
 
 Your fastapi app objects will be mapped with kedro pipeline objects, and the run results will be injected into your KedroFastAPI object through [FastAPI dependency injection](https://fastapi.tiangolo.com/tutorial/dependencies/). Here is an illustration of the kedro <-> fastapi objects mapping: 
 
 ![Kedro FastAPI objects mapping](.github/kedro_fastapi_mapping.PNG)
 
-A default FastAPI app is used if no FastAPI app given. It would serve a single endpoint that run your selected pipeline
+A default FastAPI app is used if no FastAPI app given. It would serve a single endpoint that run in background your selected pipeline
 
 ```
-kedro boot fastapi
+kedro boot fastapi <kedro_run_args>
 ```
 
 These production-ready features would be natively included in your FastAPI apps:
@@ -51,7 +51,7 @@ These production-ready features would be natively included in your FastAPI apps:
 - [Pyctuator](https://github.com/SolarEdgeTech/pyctuator) that report some service health metrology and application states. Usually used by service orchestrators (kubernetes) or monitoring to track service health and ensure it's high availability
 - Multiple environments configurations, leveraging kedro's OmegaConfigLoader. ``["fastapi*/"]`` config pattern could be used to configure the web server. Configs could also be passed as CLI args (refer to --help)
 
-You can refer to the spaceflights [Kedro FastAPI examples](examples/src/spaceflights_kedro_fastapi/app.py) that showcases serving multiples endpoints operations that are mapped to differents pipeline namespaces
+You can learn more by testing the [spaceflights Kedro FastAPI example](examples/README.md#rest-api-with-kedro-fastapi-server) that showcases serving multiples endpoints operations that are mapped to differents pipeline namespaces
 
 
 ## Consuming Kedro pipelines through SDK
@@ -94,11 +94,11 @@ return {"__default__": spaceflights_pipelines}
 
 In this example, all the namespaces and their namespaced datasets (inputs, outputs, parameters) would infer compilation specs and therefore would be exposed to the Application. 
 
-You can use kedro-viz to visualize the datasets that woulc be exposed to the kedro boot apps. In the figure below, we see clearly that ``inference.feature_store`` and ``inference.predictions`` will be exposed to the applicaton (the blue one).
+You can use kedro-viz to visualize the datasets that woulc be exposed to the kedro boot apps. In the figure below, for the ``inference`` namespace, we see clearly that ``inference.feature_store`` and ``inference.predictions`` will be exposed to the applicaton (the blue one).
 
 ![pipeline_namespace](.github/pipeline_namespace.png)
 
-Below are the different categories of datasets that forms the compiled catalog.
+Below are the differents categories of datasets that forms the compiled catalog.
 
 - Inputs: inputs datasets that are be injected by the app at iteration time.
 - Outputs: outputs dataset that hold the run results.
@@ -106,7 +106,7 @@ Below are the different categories of datasets that forms the compiled catalog.
 - Artifacts: artifacts datasets that are materialized (loaded as MemoryDataset) at startup time.
 - Templates: template datasets that contains ${itertime_params: param_name}. Their attributes are interpolated at iteration time. 
 
-You can compile the catalog without actually using it in a Kedro Boot App. This is helpful for verifying if the expected artifacts datasets are correctly infered or if the template datasets are correctly detected.
+You can compile the catalog without actually using it in a Kedro Boot App. This is helpful for verifying if the expected artifacts datasets are correctly infered or if the template datasets are correctly detected. Here is an example of the catalog compilation report for a pipeline that contains an ``inference`` namespace.
 
 ```
 kedro boot compile
@@ -164,7 +164,7 @@ session = boot_project(
 run_results = session.run(inputs={"your_dataset_name": your_data})
 ```
 
-You can found a complete example of a steamlit app that serve an ML model in the [Kedro Boot Examples](examples) project. We invite you to test it to gain a better understanding of Kedro Boot's ``boot_project`` or ``boot_package`` interfaces
+You can found a complete example of a steamlit app that serve an ML model in the [Kedro Boot Examples](examples/README.md#data-app-with-streamlit-standalone-mode) project. We invite you to test it to gain a better understanding of Kedro Boot's ``boot_project`` or ``boot_package`` interfaces
 
 ### Embedded mode : The application is embeded inside kedro project
 
@@ -212,7 +212,7 @@ kedro boot run <kedro_run_args>
 kedro boot run --app path.to.your.KedroBootApp <kedro_run_args>
 ````
 
-You can fnd two examples of using the embeded mode in the [Kedro Boot Examples](examples) project
+You can find an example of a [Monte Carlo App embeded into a kedro project](examples/README.md#monte-carlo-simulation-embeded-mode)
 
 
 ## Why does Kedro Boot exist ?

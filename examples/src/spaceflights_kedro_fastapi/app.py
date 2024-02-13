@@ -1,8 +1,9 @@
 from typing import List
 from fastapi import FastAPI, Query
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
-from kedro_boot.app.fastapi import KedroFastApi
+from kedro_boot.app.fastapi.session import KedroFastApi
 
 
 app = FastAPI(title="Spaceflights shuttle price prediction")
@@ -37,3 +38,8 @@ async def run_evaluation_pipeline(
     r2_multioutput: str = Query("uniform_average"),
 ) -> dict:
     return kedro_run
+
+
+@app.get("/")
+async def docs_redirect():
+    return RedirectResponse(url="/docs")

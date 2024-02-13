@@ -1,5 +1,5 @@
 import click
-from kedro_boot.app.fastapi import FastApiApp
+from kedro_boot.app.fastapi.app import FastApiApp
 from kedro_boot.framework.cli import kedro_boot_command_factory
 
 app_params = [

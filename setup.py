@@ -56,6 +56,7 @@ setup(
             "fastapi>=0.100.0",
             "gunicorn==21.2.0",
             "pyctuator==0.18.1",
+            "uvicorn[standard]>=0.12.0",
         ],
     },
     entry_points={
