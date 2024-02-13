@@ -43,6 +43,10 @@ class FastApiApp(AbstractKedroBootApp):
                 f"{e.msg}. If you're using the Kedro FastAPI Server, you should consider installing fastapi extra dependencies 'pip install kedro-boot[fastapi]'"
             )
 
+        kedro_boot_session.config_loader.config_patterns.update(
+            {"fastapi": ["fastapi*/"]}
+        )
+
         try:
             server_file_options = kedro_boot_session.config_loader["fastapi"].get(
                 "server", {}
