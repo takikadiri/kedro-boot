@@ -1,4 +1,4 @@
-kedro-boot[fastapi]==0.2.0
+kedro-boot[fastapi]==0.2.1
 kedro-datasets[pandas.CSVDataSet, pandas.ExcelDataSet, pandas.ParquetDataSet]>=1.0
 kedro-viz>=7.1.0
 streamlit==1.27.2
