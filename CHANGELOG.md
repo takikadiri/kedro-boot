@@ -2,13 +2,15 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2024-02-13
+
 ### Added
 
-- :sparkles: Include ["fastapi*/] dynamically in the config loader config patterns
+-   :sparkles: Include ["fastapi*/] dynamically in the config loader config patterns
 
 ### Fixed
 
-- :bug: Catch fastapi extra dependecies errors, and make their imports lazy.
+-   :bug: Catch fastapi extra dependecies errors, and make their imports lazy.
 
 ## [0.2.0] - 2024-02-12
 
@@ -34,7 +36,9 @@
 -   :tada: Add `boot_session` utility that create a `KedroBootSession` inside a external standalone App 
 -   :tada: Add `AppPipeline` and its `app_pipeline` factory for declaring and registring application views on top of kedro pipelines
 
-[Unreleased]: https://github.com/takikadiri/kedro-boot/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/takikadiri/kedro-boot/compare/0.2.1...HEAD
+
+[0.2.1]: https://github.com/takikadiri/kedro-boot/compare/0.2.0...0.2.1
 
 [0.2.0]: https://github.com/takikadiri/kedro-boot/compare/0.1.0...0.2.0
 
