@@ -6,19 +6,66 @@
 [![Powered by Kedro](https://img.shields.io/badge/powered_by-kedro-ffc900?logo=kedro)](https://kedro.org)
 
 # What is kedro-boot ?
-Kedro Boot makes it simple to integrate your Kedro pipelines with any applications. It's a framework for creating APIs and SDKs for you kedro projects.
+Kedro Boot simplifies the integration of your Kedro pipelines with any applications. It's a framework for creating APIs and SDKs for your Kedro projects.
 It offers these key functionalities: 
 
-- Data injection: Streamline the process of feeding data from any application into Kedro pipelines
-- Low-Latency Execution: Execute multiple pipeline runs with minimal delay, optimising for time-sensitive web applications.
+- :syringe: **Data injection**: Streamline the process of feeding data from any application into Kedro pipelines.
+- :zap: **Low-Latency**: Execute multiple pipeline runs with minimal delay with optimisation for time-sensitive web applications.
 
-This enable using Kedro pipelines in a wide range of use cases, including model serving, data apps (streamlit, dash), statistical simulations, paralell processing of unstructured data, streaming, and more.  It also streamline the deployment of your Kedro pipeline into various Data & AI Platforms
+This enables using Kedro pipelines in a wide range of use cases, including model serving, data apps (streamlit, dash), statistical simulations, parallel processing of unstructured data, streaming...  It also streamlines the deployment of your Kedro pipelines into various Data & AI Platforms (e.g. Databricks, DataRobot...).
 
 _If you're new to [kedro](https://github.com/kedro-org/kedro), we invite you to visit [kedro docs](https://docs.kedro.org/en/stable/)_
 
 # How do I use Kedro Boot ?
 
-Any application can consume kedro pipelines through REST APIs or as a library (SDK). Kedro Boot provides utilities and abstractions for each of these integration patterns
+Any application can consume kedro pipelines through REST APIs or as a library (SDK). ``kedro-boot`` provides utilities and abstractions for each of these integration patterns. 
+
+## Hello world
+
+### Use case 1 : The standalone mode - How to run a kedro pipeline from another application
+
+In this section, we assume you want to trigger the run of a kedro pipeline from another application which holds the entry point. This refer to applications that have their own CLI entry points (e.g. ``streamlit run``) and cannot be embedded in kedro's entry point (e.g. you cannot open streamlit with ``kedro run``). Low code UI (Streamlit, Dash...) and Data & AI Platforms are examples of such applications.
+
+> [!IMPORTANT]  
+> The key concept of kedro-boot is the ``KedroBootSession``. It is basically a standard ``KedroSession`` with 2 main differences: 
+> - you can run the same session multiple times with many speed optimisation (including dataset caching)
+> - you can pass data and parameters at runtime : ``session.run(inputs={"your_dataset_name": your_data}, itertime_params={"my_param": your_new_param})`` 
+
+The ``KedroBootSession`` should be created with either ``boot_project`` or ``boot_package`` (if the project as been previously packaged with ``kedro package``). A basic example would be the following: 
+
+
+```python
+from kedro_boot.app.booter import boot_project
+from kedro_boot.app.booter import boot_package
+from kedro_boot.framework.compilation.specs import CompilationSpec
+
+session = boot_project(
+    project_path="<your_project_path>",
+    compilation_specs=[CompilationSpec(inputs=["your_dataset_name"])], # Would be infered if not given
+    kedro_args={ # kedro run args
+        "pipeline": "your_pipeline", # IMPORTANT : You must create one KedroBootSession per pipeline, except for namespaced pipelines
+        "conf_source": "<your_conf_source>",
+    },
+)
+
+# session = boot_package(
+#     package_name="<your_package_name>",
+#     compilation_specs=[CompilationSpec(inputs=["your_dataset_name"])],
+#     kedro_args={
+#         "pipeline": "your_pipeline",
+#         "conf_source": "<your_conf_source>",
+#     },
+# )
+
+run_results = session.run(inputs={"your_dataset_name": your_data})
+run_results2 = session.run(inputs={"your_dataset_name": your_data2})
+```
+
+You can found a complete example of a steamlit app that serve an ML model in the [Kedro Boot Examples](examples/README.md#data-app-with-streamlit-standalone-mode) project. We invite you to test it to gain a better understanding of Kedro Boot's ``boot_project`` or ``boot_package`` interfaces. 
+
+> [!TIP]  
+> The ``CompilationSpec`` gives you advanced control on how to configure the behaviour (which dataset to preload and cache, which arguments to pass on each iteration...). See [the documentation]() for more details. 
+
 
 ## Consuming Kedro pipeline through REST API
 
@@ -127,46 +174,10 @@ We can see that the ``training.regressor`` is beign infered as artifact, it will
 
 Note that when infering compilation specs, a pipeline that have no namespaces is also exposed to the kedro boot apps (have a compilation spec), but does not expose any datasets. Applications could provide their own compilation specs in order to specify the datasets that are needed to be exposed.
 
-### Creating Kedro Boot Session
-
-The Kedro Boot Session could be created from within an external application using ``boot_project`` or ``boot_package`` factories, or it can be created inside the kedro project using the ``AbstractKedroBootApp`` in the case of an embeded application.  
-
-
-#### Standalone mode: The application hold the entry point
-
-This refer to applications that have their own CLI entry points and cannot be embeded in kedro's entry point. Streamlit and Data & AI Platforms are an example of such applications.
-
-These application could create a Kedro Boot Session from kedro project or kedro package, using ``boot_project`` or ``boot_package``
-
-```python
-from kedro_boot.app.booter import boot_project
-from kedro_boot.app.booter import boot_package
-from kedro_boot.framework.compilation.specs import CompilationSpec
-
-session = boot_project(
-    project_path="<your_project_path>",
-    compilation_specs=[CompilationSpec(inputs=["your_dataset_name"])], # Would be infered if not given
-    kedro_args={ # kedro run args
-        "pipeline": "your_pipeline",
-        "conf_source": "<your_conf_source>",
-    },
-)
-
-# session = boot_package(
-#     package_name="<your_package_name>",
-#     compilation_specs=[CompilationSpec(inputs=["your_dataset_name"])],
-#     kedro_args={
-#         "pipeline": "your_pipeline",
-#         "conf_source": "<your_conf_source>",
-#     },
-# )
-
-run_results = session.run(inputs={"your_dataset_name": your_data})
-```
-
-You can found a complete example of a steamlit app that serve an ML model in the [Kedro Boot Examples](examples/README.md#data-app-with-streamlit-standalone-mode) project. We invite you to test it to gain a better understanding of Kedro Boot's ``boot_project`` or ``boot_package`` interfaces
 
 ### Embedded mode : The application is embeded inside kedro project
+
+The ``KedroBootSession`` can be created inside the kedro project using the ``AbstractKedroBootApp`` in the case of an embedded application.  
 
 This mode involves using Kedro Boot to embed an application inside a Kedro project, leveraging kedro's entry points, session and config loader for managing application lifecycle. It's suitable for use cases when the application is lightweight and owned by the same team that developed the kedro pipelines.
 
