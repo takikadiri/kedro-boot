@@ -20,7 +20,7 @@ _If you're new to [kedro](https://github.com/kedro-org/kedro), we invite you to 
 
 Any application can consume kedro pipelines through REST APIs or as a library (SDK). ``kedro-boot`` provides utilities and abstractions for each of these integration patterns. 
 
-## Hello world
+## Getting started
 
 ### Use case 1 : The standalone mode - How to run a kedro pipeline from another application
 
@@ -65,14 +65,14 @@ You can found a complete example of a steamlit app that serve an ML model in the
 > [!TIP]  
 > The ``CompilationSpec`` gives you advanced control on how to configure the behaviour (which dataset to preload and cache, which arguments to pass on each iteration...). See [the documentation]() for more details. 
 
-### Use case 2 : The embedded mode - Launching an app from kedro
+### Use case 2 : The embedded mode - Launching an application within kedro
 
 > [!IMPORTANT]  
-> The 2nd key concept of ``kedro-boot`` is the ``AbstractKedroBootApp``. When used inside a kedro project, this class automatically creates a ``KedroBootSession``  which is passed to a ``_run`` method. You can inherit from it to customize the way the way your pipeline is ran (e.g. running it mulitple times) or to start an application inside a kedro run (e.g. serve the pipeline as API) .
+> The 2nd key concept of ``kedro-boot`` is the ``KedroBootApp`` which is an implementation of the ``AbstractKedroBootApp``. When used inside a kedro project, this class automatically creates a ``KedroBootSession``  which is passed to a ``_run``  abstract method. You can inherit from it to customize the way the way your pipeline is ran (e.g. running it mulitple times) or to start an application inside a kedro run (e.g. serve the pipeline as API) .
 
 This mode involves using ``kedro-boot`` to embed an application inside a Kedro project, leveraging kedro's entry points, session and config loader for managing application lifecycle. It's suitable for use cases when the application is lightweight and owned by the same team that developed the kedro pipelines.
 
-An embedded ``kedro-boot`` "App" is an implementation of the ``AbstractKedroBootApp``. The ``KedroBootSession`` is provided through the ``_run`` abstract method. 
+Hereafter is an example of a ``KedroBootApp`` on how to loop over a pipeline for a given number of iterations passed trhough a config file 
 
 ```python
 from kedro_boot.app import AbstractKedroBootApp
@@ -94,7 +94,7 @@ class KedroBootApp(AbstractKedroBootApp):
 
 The Kedro Boot App could be declared either in kedro's ``settings.py`` or as ``kedro boot`` run CLI args :
 
-- Declaring Kedro Boot App through ``settings.py``
+- Declaring ``KedroBootApp`` through ``settings.py``
 
 ```python
 from your_package.your_module import KedroBootApp
@@ -148,7 +148,7 @@ kedro boot fastapi <kedro_run_args>
 
 These production-ready features would be natively included in your FastAPI apps:
 
-- Embedded [Gunicron web server](https://gunicorn.org/) (only for Linux and macOS)
+- Embedded [Gunicorn web server](https://gunicorn.org/) (only for Linux and macOS)
 - [Pyctuator](https://github.com/SolarEdgeTech/pyctuator) that report some service health metrology and application states. Usually used by service orchestrators (kubernetes) or monitoring to track service health and ensure it's high availability
 - Multiple environments configurations, leveraging kedro's ``OmegaConfigLoader``. ``["fastapi*/"]`` config pattern could be used to configure the web server. Configs could also be passed as CLI args (refer to ``--help``)
 
