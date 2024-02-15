@@ -14,7 +14,7 @@ class KedroBootRunner:
     ) -> None:
         if runner and not isinstance(runner, AbstractRunner):
             raise KedroBootRunnerError(
-                f"The runner parameter should be an AbstracRunner, {runner.__class__.__name__} given instead"
+                f"The runner parameter should be an AbstractRunner, {runner.__class__.__name__} given instead"
             )
 
         self.runner = runner or SequentialRunner()
