@@ -155,7 +155,7 @@ These production-ready features would be natively included in your FastAPI apps:
 You can learn more by testing the [spaceflights Kedro FastAPI example](examples/README.md#rest-api-with-kedro-fastapi-server) that showcases serving multiples endpoints operations that are mapped to differents pipeline namespaces.
 
 
-## Consuming Kedro pipelines through SDK
+## Understanding the integration process
 
 Any python applications could consume kedro pipeline as a library. The integration process involves two steps:
 
