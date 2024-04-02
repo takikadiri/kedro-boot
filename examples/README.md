@@ -118,7 +118,7 @@ In this example we'll estimate Pi using monte carlo simulation. This demonstrate
 You can configure the app using ``conf/base/monte_carlo.yml`` and start it by running : 
 
 ```
-kedro boot --app monte_carlo_pi.app.MonteCarloApp --pipeline monte_carlo
+kedro boot run --app monte_carlo_pi.app.MonteCarloApp --pipeline monte_carlo
 ```
 
 You can disable logs using logging.yml to speed up simulation.
