@@ -36,7 +36,7 @@ The ``KedroBootSession`` should be created with either ``boot_project`` or ``boo
 ```python
 from kedro_boot.app.booter import boot_project
 from kedro_boot.app.booter import boot_package
-from kedro_boot.framework.compilation.specs import CompilationSpec
+from kedro_boot.framework.compiler.specs import CompilationSpec
 
 session = boot_project(
     project_path="<your_project_path>",
