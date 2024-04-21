@@ -2,11 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: Kedro Boot commands now works inside a subdirectory
+
+### Fixed
+
+- :bug: Fix Kedro Boot commands by supporting kedro 0.19.4 breaking changes of the ``_is_project`` utility 
+
 ## [0.2.1] - 2024-02-13
 
 ### Added
 
--   :sparkles: Include ["fastapi*/] dynamically in the config loader config patterns
+- :sparkles: Include ["fastapi*/] dynamically in the config loader config patterns
 
 ### Fixed
 
