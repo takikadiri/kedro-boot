@@ -2,9 +2,8 @@
 import click
 import logging
 from pathlib import Path
-from kedro.framework.startup import _is_project
 from .factory import kedro_boot_command_factory
-from .utils import get_entry_points_commands
+from .utils import get_entry_points_commands, _is_project, _find_kedro_project
 
 LOGGER = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ class KedroClickGroup(click.Group):
         self.commands = {}
 
         # add commands on the fly based on conditions
-        if _is_project(Path.cwd()):
+        if _is_project(_find_kedro_project(Path.cwd()) or Path.cwd()):
             self.add_command(run_command)
             self.add_command(compile_command)
             for entry_point_command in entry_points_commands:
