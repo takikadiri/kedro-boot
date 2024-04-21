@@ -1,6 +1,6 @@
-kedro-boot[fastapi]==0.2.1
+kedro-boot[fastapi]==0.2.2
 kedro-datasets[pandas.CSVDataSet, pandas.ExcelDataSet, pandas.ParquetDataSet]>=1.0
-kedro-viz>=7.1.0
+kedro-viz>=9.0.0
 streamlit==1.27.2
 scikit-learn~=1.0
 jupyter
