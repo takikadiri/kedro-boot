@@ -2,19 +2,21 @@
 
 ## [Unreleased]
 
+## [0.2.2] - 2024-04-21
+
 ### Added
 
-- :sparkles: Kedro Boot commands now works inside a subdirectory
+-   :sparkles: Kedro Boot commands now works inside a subdirectory
 
 ### Fixed
 
-- :bug: Fix Kedro Boot commands by supporting kedro 0.19.4 breaking changes of the ``_is_project`` utility 
+-   :bug: Fix Kedro Boot commands by supporting kedro 0.19.4 breaking changes of the `_is_project` utility 
 
 ## [0.2.1] - 2024-02-13
 
 ### Added
 
-- :sparkles: Include ["fastapi*/] dynamically in the config loader config patterns
+-   :sparkles: Include ["fastapi*/] dynamically in the config loader config patterns
 
 ### Fixed
 
@@ -44,7 +46,9 @@
 -   :tada: Add `boot_session` utility that create a `KedroBootSession` inside a external standalone App 
 -   :tada: Add `AppPipeline` and its `app_pipeline` factory for declaring and registring application views on top of kedro pipelines
 
-[Unreleased]: https://github.com/takikadiri/kedro-boot/compare/0.2.1...HEAD
+[Unreleased]: https://github.com/takikadiri/kedro-boot/compare/0.2.2...HEAD
+
+[0.2.2]: https://github.com/takikadiri/kedro-boot/compare/0.2.1...0.2.2
 
 [0.2.1]: https://github.com/takikadiri/kedro-boot/compare/0.2.0...0.2.1
 
