@@ -19,7 +19,7 @@ with open("README.md", encoding="utf-8") as file_handler:
 
 setup(
     name="kedro-boot",
-    version="0.2.1",
+    version="0.2.2",
     description="A kedro plugin that streamlines the integration between Kedro projects and external applications, making it easier for you to develop production-ready data science applications.",
     license="Apache Software License (Apache 2.0)",
     long_description=README,
