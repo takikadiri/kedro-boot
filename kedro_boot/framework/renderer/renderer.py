@@ -66,7 +66,7 @@ def render_parameter_datasets(
     remaining_catalog_params = set(catalog_parameters) - set(formatted_iteration_params)
     if remaining_catalog_params:
         LOGGER.warning(
-            f"There is not enough given iteration parameters to render all the catalog parameters. Exposed Catalog parameters are {set(catalog_parameters)} and the actual given iteration parameters are {formatted_iteration_params}. {remaining_catalog_params} cannot be rendered"
+            f"There are not enough given iteration parameters to render all the catalog parameters. Exposed Catalog parameters are {set(catalog_parameters)} and the actual given iteration parameters are {formatted_iteration_params}. {remaining_catalog_params} cannot be rendered"
         )
 
     # check remaining iteration parameters in case of having only parameters dataset
@@ -78,7 +78,7 @@ def render_parameter_datasets(
         )
         if remaining_iteration_params:
             LOGGER.warning(
-                f"There is remainig iteration parameters that are not used for rendering catalog parameters. Catalog parameters are {catalog_parameters_values} and the actual given iteration parameters are {iteration_parameters_values}. {remaining_iteration_params} are remaining unused"
+                f"There are remaining iteration parameters that are not used for rendering catalog parameters. Catalog parameters are {catalog_parameters_values} and the actual given iteration parameters are {iteration_parameters_values}. {remaining_iteration_params} are unused"
             )
     else:
         remaining_iteration_params = set(formatted_iteration_params) - set(
@@ -86,7 +86,7 @@ def render_parameter_datasets(
         )
         if remaining_iteration_params:
             LOGGER.warning(
-                f"There is remainig iteration parameters that are not used for rendering catalog parameters. Catalog parameters are {set(catalog_parameters)} and the actual given iteration parameters are {formatted_iteration_params}. {remaining_iteration_params} are remaining unused"
+                f"There are remaining iteration parameters that are not used for rendering catalog parameters. Catalog parameters are {set(catalog_parameters)} and the actual given iteration parameters are {formatted_iteration_params}. {remaining_iteration_params} are unused"
             )
 
     rendered_datasets = {}
