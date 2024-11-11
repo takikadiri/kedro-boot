@@ -149,7 +149,7 @@ kedro boot fastapi <kedro_run_args>
 These production-ready features would be natively included in your FastAPI apps:
 
 - Embedded [Gunicorn web server](https://gunicorn.org/) (only for Linux and macOS)
-- [Pyctuator](https://github.com/SolarEdgeTech/pyctuator) that report some service health metrology and application states. Usually used by service orchestrators (kubernetes) or monitoring to track service health and ensure it's high availability
+- [Pyctuator](https://github.com/SolarEdgeTech/pyctuator) that report some service health metrology and application states. Usually used by service orchestrators (kubernetes) or monitoring to track service health and ensure its high availability
 - Multiple environments configurations, leveraging kedro's ``OmegaConfigLoader``. ``["fastapi*/"]`` config pattern could be used to configure the web server. Configs could also be passed as CLI args (refer to ``--help``)
 
 You can learn more by testing the [spaceflights Kedro FastAPI example](examples/README.md#rest-api-with-kedro-fastapi-server) that showcases serving multiples endpoints operations that are mapped to differents pipeline namespaces.
