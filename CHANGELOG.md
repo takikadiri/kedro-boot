@@ -4,6 +4,10 @@
 
 ## [0.2.3] - 2024-11-15
 
+### Added
+
+- ✨ enable running kedro boot commands from packaged projects
+
 ## [0.2.2] - 2024-04-21
 
 ### Added
