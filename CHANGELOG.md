@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.3] - 2024-11-15
+
+### Added
+
+- ✨ enable running kedro boot commands from packaged projects
+
 ## [0.2.2] - 2024-04-21
 
 ### Added
@@ -46,7 +52,9 @@
 -   :tada: Add `boot_session` utility that create a `KedroBootSession` inside a external standalone App 
 -   :tada: Add `AppPipeline` and its `app_pipeline` factory for declaring and registring application views on top of kedro pipelines
 
-[Unreleased]: https://github.com/takikadiri/kedro-boot/compare/0.2.2...HEAD
+[Unreleased]: https://github.com/takikadiri/kedro-boot/compare/0.2.3...HEAD
+
+[0.2.3]: https://github.com/takikadiri/kedro-boot/compare/0.2.2...0.2.3
 
 [0.2.2]: https://github.com/takikadiri/kedro-boot/compare/0.2.1...0.2.2
 
