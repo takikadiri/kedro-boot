@@ -24,16 +24,10 @@ entry_points_commands = get_entry_points_commands("kedro_boot")
 class KedroClickGroup(click.Group):
     def reset_commands(self):
         self.commands = {}
-
-        # add commands on the fly based on conditions
-        if _is_project(_find_kedro_project(Path.cwd()) or Path.cwd()):
-            self.add_command(run_command)
-            self.add_command(compile_command)
-            for entry_point_command in entry_points_commands:
-                self.add_command(entry_point_command)
-
-        # else:
-        #     self.add_command(new) # TODO : IMPLEMENT THIS FUNCTION
+        self.add_command(run_command)
+        self.add_command(compile_command)
+        for entry_point_command in entry_points_commands:
+            self.add_command(entry_point_command)
 
     def list_commands(self, ctx):
         self.reset_commands()
