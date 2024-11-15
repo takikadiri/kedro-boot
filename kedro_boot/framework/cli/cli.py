@@ -1,9 +1,8 @@
 """A CLI factory for kedro boot apps"""
 import click
 import logging
-from pathlib import Path
 from .factory import kedro_boot_command_factory
-from .utils import get_entry_points_commands, _is_project, _find_kedro_project
+from .utils import get_entry_points_commands
 
 LOGGER = logging.getLogger(__name__)
 
