@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- :bug: Fix Kedro 0.19.11 incompatibility by implementing the new `_get_executor` AbstractRunner method in the `KedroBootAdapter` 
+
 ## [0.2.3] - 2024-11-15
 
 ### Added
