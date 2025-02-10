@@ -1,4 +1,5 @@
 """``KedroBootAdapter`` transform a Kedro Session Run to a booting process."""
+from concurrent.futures import Executor
 import logging
 from typing import Any, Optional, Union
 
@@ -37,6 +38,10 @@ class KedroBootAdapter(AbstractRunner):
         self._app = app
         self._config_loader = config_loader
         self._app_runtime_params = app_runtime_params or {}
+
+    def _get_executor(self, max_workers: int) -> Executor:
+        """Abstract method to provide the correct executor (e.g., ThreadPoolExecutor or ProcessPoolExecutor)."""
+        pass
 
     def run(
         self,
