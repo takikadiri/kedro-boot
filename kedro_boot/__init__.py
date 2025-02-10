@@ -1,6 +1,6 @@
 """Kedro Boot is a Kedro plugin that streamlines the integration between Kedro projects and external applications."""
 
-__version__ = "0.2.3"
+__version__ = "0.2.4"
 
 import logging
 
