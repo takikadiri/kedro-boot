@@ -4,7 +4,9 @@
 
 ## Configure and register the pipeline you want to serve
 
-## Create a KedroFastApi app
+## Create a custom KedroFastApi app in your project
 
-## Register your App in 
+## Register your App in your kedro project
+
+## Serve your pipeline 
 

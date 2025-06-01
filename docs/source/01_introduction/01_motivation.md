@@ -32,13 +32,13 @@ Running the session programatically is very convenient when you want to call ked
 
 ``kedro-boot`` offers the [``KedroBootSession`` object](./02_concept_kedro_boot_session.md) to achieve this behaviour.
 
-## The embedded mode - Modify the ``kedro run`` behaviour
+## The embedded mode - Modify the ``kedro run`` CLI behaviour
 
 ```{note}
 Detailed motivations and issues with current kedro beahviour is described in the [Universal Kedro deployment (Part 3) - Add the ability to extend and distribute the project running logic ](https://github.com/kedro-org/kedro/issues/1041).
 ```
 
-Kedro offers a lot of way to modify the way the ``KedroSession`` behaves (mainly through hooks), but we sometimes want to modify the way the ``KedroSession`` itself is ran. The most common use case is when you want to loop over the ``KedroSession`` and run it multiples times with different parameters, e.g. for hyperparameter tuning. In a nutshell, we would like to be able to to domething like 
+Kedro offers a lot of way to modify the way the ``KedroSession`` behaves (mainly through hooks), but we sometimes want to modify the way the ``KedroSession`` itself is ran. The most common use case is when you want to loop over the ``KedroSession`` and run it multiples times with different parameters, e.g. for hyperparameter tuning. In a nutshell, we would like to be able to to domething like: 
 
 ```bash
 kedro run --pipeline=my-pipeline --runner=my_package.myCustomRunner

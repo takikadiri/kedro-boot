@@ -13,7 +13,7 @@ pip install kedro-boot
 ```
 
 ```{important}
-It is very recommended to install it inside a virtual environment.
+It is recommended to install it inside a virtual environment.
 ```
 
 ## Installing from source
@@ -24,8 +24,6 @@ You can also install the latest development version directly from github (only i
 pip install git+https://github.com/takikadiri/kedro-boot.git
 ```
 
-
 ## Check the install
 
 ``kedro-boot`` is a kedro plugin and will automatically be registered if you are in a kedro project, hence its commands will be automatically available. You can check that it is properly discovered by kedro by launching ``kedro info`` command. You should see a message displaying the kedro boot version. 
-

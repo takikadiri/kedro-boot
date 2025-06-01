@@ -1,3 +1,7 @@
 # Getting started with embedded mode - Customizing running behaviour
 
-# Passing itertime params
+## Create your KedroBootApp 
+
+## Register your KedroBootApp in your kedro project
+
+## Run your app

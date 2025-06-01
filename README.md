@@ -7,7 +7,7 @@
 
 # What is kedro-boot ?
 Kedro Boot simplifies the integration of your Kedro pipelines with any applications. It's a framework for creating APIs and SDKs for your Kedro projects.
-It offers these key functionalities: 
+It offers these key functionalities:
 
 - :syringe: **Data injection**: Streamline the process of feeding data from any application into Kedro pipelines.
 - :zap: **Low-Latency**: Execute multiple pipeline runs with minimal delay with optimisation for time-sensitive web applications.
@@ -84,7 +84,7 @@ class KedroBootApp(AbstractKedroBootApp):
         # leveraging config_loader to manage app's configs
         my_app_configs = kedro_boot_session.config_loader[
             "my_app"
-        ]  # You should delcare this config pattern in settings.py
+        ]  # You should declare this config pattern in settings.py
 
         for _ in my_app_configs.get("num_iteration"):  # Doing mutliples pipeline runs
             kedro_boot_session.run(
