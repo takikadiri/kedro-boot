@@ -60,7 +60,7 @@ session = boot_package(
 
 ::::
 
-```important
+```{important}
 You need to create **one ``KedroBootSession`` for per pipeline**, you cannot handle several pipelines in the same ``KedroBootSession`` except namespaced pipelines with the same namespace. 
 ```
 
@@ -76,7 +76,7 @@ run_results = session.run(inputs={"your_dataset_name": your_data}) # run results
 
 ### Running the same session multiple time
 
-You can run the *same* session multiple times, without recreating it with a different input: 
+You can run the *same* session multiple times, without recreating it with a different input:
 
 ```python
 run_results2 = session.run(inputs={"your_dataset_name": your_data2})
