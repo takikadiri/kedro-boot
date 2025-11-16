@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-11-16
+
 ### Added
 
 -   ✨ Support Kedro 1.x and drop support for 0.19.x
@@ -62,7 +64,9 @@
 -   :tada: Add `boot_session` utility that create a `KedroBootSession` inside a external standalone App 
 -   :tada: Add `AppPipeline` and its `app_pipeline` factory for declaring and registring application views on top of kedro pipelines
 
-[Unreleased]: https://github.com/takikadiri/kedro-boot/compare/0.2.4...HEAD
+[Unreleased]: https://github.com/takikadiri/kedro-boot/compare/0.3.0...HEAD
+
+[0.3.0]: https://github.com/takikadiri/kedro-boot/compare/0.2.4...0.3.0
 
 [0.2.4]: https://github.com/takikadiri/kedro-boot/compare/0.2.3...0.2.4
 
