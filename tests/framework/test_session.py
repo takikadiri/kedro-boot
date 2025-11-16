@@ -1,8 +1,7 @@
 from typing import List
 from kedro_boot.framework.session.session import KedroBootSession
 import pytest
-from kedro.pipeline import Pipeline
-from kedro.pipeline.modular_pipeline import pipeline
+from kedro.pipeline import Pipeline, pipeline
 from kedro.framework.hooks.manager import _NullPluginManager
 from kedro.config import OmegaConfigLoader
 from kedro.io import DataCatalog, MemoryDataset
@@ -173,21 +172,23 @@ parametrized_test_session_scenarios = [
         ],
         DataCatalog(
             {
-                "n1.A": MemoryDataset(2),
-                "params:n1.B": MemoryDataset(1),
-                "n1.C": MemoryDataset(),
-                "n1.D": MemoryDataset(),
-                "n1.E": MemoryDataset(),
-                "F": JSONDataset(filepath=template_filepath),
-            },
-            {
-                "n2.A": MemoryDataset(4),
-                "params:n2.B": MemoryDataset(1),
-                "n2.C": MemoryDataset(),
-                "n2.D": MemoryDataset(),
-                "n2.E": MemoryDataset(),
-                "n2.F": JSONDataset(filepath=template_filepath),
-            },
+                **{
+                    "n1.A": MemoryDataset(2),
+                    "params:n1.B": MemoryDataset(1),
+                    "n1.C": MemoryDataset(),
+                    "n1.D": MemoryDataset(),
+                    "n1.E": MemoryDataset(),
+                    "F": JSONDataset(filepath=template_filepath),
+                },
+                **{
+                    "n2.A": MemoryDataset(4),
+                    "params:n2.B": MemoryDataset(1),
+                    "n2.C": MemoryDataset(),
+                    "n2.D": MemoryDataset(),
+                    "n2.E": MemoryDataset(),
+                    "n2.F": JSONDataset(filepath=template_filepath),
+                },
+            }
         ),
         {"namespace": "n1", "parameters": {"B": 1}},
         4096,

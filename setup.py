@@ -44,9 +44,9 @@ setup(
             "pytest-cov>=2.8.0, <5.0.0",
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
-            "ruff==0.1.3",
+            "ruff",
             "scikit-learn~=1.0",
-            "kedro-datasets[pandas.CSVDataset, pandas.ExcelDataset, pandas.ParquetDataset]>=1.0",
+            "kedro-datasets[pandas.CSVDataset, pandas.ExcelDataset, pandas.ParquetDataset]>=8.0.0",
         ],
         "dev": [
             "pre-commit>=2.0.0,<4.0.0",
@@ -54,8 +54,8 @@ setup(
         ],
         "fastapi": [
             "fastapi>=0.100.0",
-            "gunicorn==21.2.0",
-            "pyctuator==0.18.1",
+            "gunicorn>=23.0.0",
+            "pyctuator>=1.2.0",
             "uvicorn[standard]>=0.12.0",
         ],
     },

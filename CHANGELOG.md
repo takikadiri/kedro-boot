@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   ✨ Support Kedro 1.x and drop support for 0.19.x
+
 ## [0.2.4] - 2025-02-10
 
 ### Fixed

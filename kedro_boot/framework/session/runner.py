@@ -23,13 +23,17 @@ class KedroBootRunner:
         self._hook_manager = hook_manager
 
     def run(
-        self, pipeline: Pipeline, catalog: DataCatalog, outputs_datasets: List[str]
+        self,
+        pipeline: Pipeline,
+        catalog: DataCatalog,
+        outputs_datasets: List[str],
+        run_id: str = None,
     ) -> Dict[str, Any]:
         self.runner.run(
             pipeline=pipeline,
             catalog=catalog,
             hook_manager=self._hook_manager,
-            session_id=self._session_id,
+            run_id=run_id,
         )
 
         output_datasets = {}

@@ -1,4 +1,5 @@
-""""``KedroBootContext`` provides context for the kedro boot project."""
+""" "``KedroBootContext`` provides context for the kedro boot project."""
+
 import logging
 from typing import List, Optional, Tuple
 
@@ -97,7 +98,7 @@ class KedroBootContext:
             #     raise KedroBootContextError(f"The {compilation_spec.namespace} namespace contains no nodes")
 
             pipeline_inputs = {
-                dataset_name: self.catalog._get_dataset(dataset_name)
+                dataset_name: self.catalog.get(dataset_name)
                 for dataset_name in pipeline.inputs()
             }
 
@@ -123,7 +124,7 @@ class KedroBootContext:
             )
 
             all_pipeline_outputs = {
-                dataset_name: self.catalog._get_dataset(dataset_name)
+                dataset_name: self.catalog.get(dataset_name)
                 for dataset_name in pipeline.all_outputs()
             }
 
@@ -179,18 +180,18 @@ class KedroBootContext:
         all_materialized_artifact_datasets = {}
         for dataset_name, dataset_value in all_artifacts_datasets.items():
             LOGGER.info(f"Loading {dataset_name} as a MemoryDataset")
-            all_materialized_artifact_datasets[
-                dataset_name
-            ] = MemoryDataset(  # Add Logging fro this operation
-                dataset_value.load(), copy_mode="assign"
+            all_materialized_artifact_datasets[dataset_name] = (
+                MemoryDataset(  # Add Logging fro this operation
+                    dataset_value.load(), copy_mode="assign"
+                )
             )
 
         # Assign the materialized artifact back to namespace/spec artifact datasets
         for namespace in self._namespaces_registry.values():
             for dataset_name in namespace["catalog"].artifacts:
-                namespace["catalog"].artifacts[
-                    dataset_name
-                ] = all_materialized_artifact_datasets[dataset_name]
+                namespace["catalog"].artifacts[dataset_name] = (
+                    all_materialized_artifact_datasets[dataset_name]
+                )
 
     def render(
         self,
@@ -225,8 +226,6 @@ class KedroBootContext:
 
         catalog_assembly = self._namespaces_registry.get(namespace).get("catalog")
 
-        rendered_catalog = DataCatalog()
-
         # Render each part of the catalog view
         input_datasets = render_input_datasets(
             catalog_inputs=catalog_assembly.inputs, iteration_inputs=namespaced_inputs
@@ -243,7 +242,7 @@ class KedroBootContext:
         output_datasets = render_datasets(datasets=catalog_assembly.outputs)
         unmanaged_datasets = render_datasets(datasets=catalog_assembly.unmanaged)
 
-        rendered_catalog.add_all(
+        rendered_catalog = DataCatalog(
             {
                 **input_datasets,
                 **output_datasets,

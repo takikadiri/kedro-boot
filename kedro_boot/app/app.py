@@ -1,5 +1,5 @@
-"""``AbstractKedroBootApp`` is the base class for all kedro boot app implementations.
-"""
+"""``AbstractKedroBootApp`` is the base class for all kedro boot app implementations."""
+
 from abc import ABC, abstractmethod
 from typing import Any, List
 

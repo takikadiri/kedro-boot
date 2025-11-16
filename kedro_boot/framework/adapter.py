@@ -1,12 +1,14 @@
 """``KedroBootAdapter`` transform a Kedro Session Run to a booting process."""
+
 from concurrent.futures import Executor
 import logging
+from time import perf_counter
 from typing import Any, Optional, Union
 
 from kedro.config import OmegaConfigLoader
 from kedro.framework.hooks.manager import _NullPluginManager
 from kedro.pipeline import Pipeline
-from kedro.io import DataCatalog
+from kedro.io import CatalogProtocol, SharedMemoryCatalogProtocol
 from kedro.runner import AbstractRunner
 from pluggy import PluginManager
 
@@ -31,9 +33,7 @@ class KedroBootAdapter(AbstractRunner):
             config_loader (OmegaConfigLoader): kedro config loader
             app_run_args (dict): App runtime args given by App CLI
         """
-
-        self._extra_dataset_patterns = {"{default}": {"type": "MemoryDataset"}}
-        super().__init__(extra_dataset_patterns=self._extra_dataset_patterns)
+        super().__init__()
 
         self._app = app
         self._config_loader = config_loader
@@ -46,9 +46,10 @@ class KedroBootAdapter(AbstractRunner):
     def run(
         self,
         pipeline: Pipeline,
-        catalog: DataCatalog,
+        catalog: CatalogProtocol | SharedMemoryCatalogProtocol,
         hook_manager: Optional[Union[PluginManager, _NullPluginManager]] = None,
-        session_id: Optional[str] = None,
+        run_id: Optional[str] = None,
+        only_missing_outputs: bool = False,
     ) -> Any:
         """Prepare Catalog and run the kedro boot app.
 
@@ -56,39 +57,49 @@ class KedroBootAdapter(AbstractRunner):
             pipeline: The ``Pipeline`` to use by the kedro boot app.
             catalog: The ``DataCatalog`` from which to fetch data.
             hook_manager: The ``PluginManager`` to activate hooks.
-            session_id: The id of the session.
+            run_id: The id of the run.
 
         """
-        hook_or_null_manager = hook_manager or _NullPluginManager()
-        catalog = catalog.shallow_copy()
+
+        # Apply missing outputs filtering if requested
+        if only_missing_outputs:
+            pipeline = self._filter_pipeline_for_missing_outputs(pipeline, catalog)
 
         # Check which datasets used in the pipeline are in the catalog or match
-        # a pattern in the catalog
-        registered_ds = [ds for ds in pipeline.datasets() if ds in catalog]
+        # a pattern in the catalog, not including extra dataset patterns
+        # Run a warm-up to materialize all datasets in the catalog before run
+        warmed_up_ds = []
+        for ds in pipeline.datasets():
+            if ds in catalog:
+                warmed_up_ds.append(ds)
+            _ = catalog.get(ds, fallback_to_runtime_pattern=True)
 
         # Check if there are any input datasets that aren't in the catalog and
         # don't match a pattern in the catalog.
-        unsatisfied = pipeline.inputs() - set(registered_ds)
+        unsatisfied = pipeline.inputs() - set(warmed_up_ds)
 
         if unsatisfied:
             raise ValueError(
-                f"Pipeline input(s) {unsatisfied} not found in the DataCatalog"
+                f"Pipeline input(s) {unsatisfied} not found in the {catalog.__class__.__name__}"
             )
 
-        # Register the default dataset pattern with the catalog
-        catalog = catalog.shallow_copy(
-            extra_dataset_patterns=self._extra_dataset_patterns
-        )
+        hook_or_null_manager = hook_manager or _NullPluginManager()
 
+        start_time = perf_counter()
         app_return = self._run(
             pipeline,
             catalog,
             hook_or_null_manager,
-            session_id,
+            run_id,
             self._app_runtime_params,
             self._config_loader,
         )
-        self._logger.info(f"{self._app.__class__.__name__} execution completed.")
+        end_time = perf_counter()
+        run_duration = end_time - start_time
+
+        self._logger.info(
+            f"{self._app.__class__.__name__} execution completed in {run_duration:.1f} sec.."
+        )
         return app_return
 
     def _run(self, *args) -> Any:

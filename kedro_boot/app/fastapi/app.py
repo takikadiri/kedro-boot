@@ -88,9 +88,9 @@ class FastApiApp(AbstractKedroBootApp):
 
             kedro_fastapi_materialized_session = KedroFastApiSession(kedro_boot_session)
             kedro_fastapi_materialized_session.compile(app)
-            app.dependency_overrides[
-                kedro_fastapi_session
-            ] = kedro_fastapi_materialized_session
+            app.dependency_overrides[kedro_fastapi_session] = (
+                kedro_fastapi_materialized_session
+            )
 
             uvicorn.run(app=app, **configs)
 
