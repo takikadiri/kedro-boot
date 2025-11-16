@@ -1,4 +1,5 @@
 """A CLI factory for kedro boot apps"""
+
 import click
 import logging
 from .factory import kedro_boot_command_factory

@@ -37,7 +37,7 @@ namespaces = false
 [tool.kedro]
 package_name = "spaceflights"
 project_name = "spaceflights"
-kedro_init_version = "0.19.2"
+kedro_init_version = "1.0.0"
 tools = ""
 example_pipeline = "False"
 source_dir = "src"
@@ -65,3 +65,5 @@ select = [
     "T201", # Print Statement
 ]
 ignore = ["E501"]  # Ruff format takes care of line-too-long
+[tool.kedro_telemetry]
+project_id = "7137b6fc30c845c38503188f208899e7"

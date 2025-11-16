@@ -110,7 +110,10 @@ class KedroBootSession:
         )
 
         iteration_outputs = self._runner.run(
-            pipeline=pipeline, catalog=catalog, outputs_datasets=outputs_datasets
+            pipeline=pipeline,
+            catalog=catalog,
+            outputs_datasets=outputs_datasets,
+            run_id=iteration_run_id,
         )
 
         LOGGER.info(f"Iteration {iteration_run_id} completed")

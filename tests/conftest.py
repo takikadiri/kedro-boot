@@ -1,6 +1,5 @@
 import pytest
-from kedro.pipeline.modular_pipeline import pipeline
-from kedro.pipeline import Pipeline, node
+from kedro.pipeline import Pipeline, pipeline, node
 from cookiecutter.main import cookiecutter
 from kedro import __version__ as kedro_version
 from kedro.framework.startup import _add_src_to_path

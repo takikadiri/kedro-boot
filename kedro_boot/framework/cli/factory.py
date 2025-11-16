@@ -66,12 +66,14 @@ def create_kedro_booter(
         tuple_tags = tuple(kedro_args.get("tags", ""))
         tuple_node_names = tuple(kedro_args.get("node_names", ""))
 
-        with KedroSession.create(
-            env=kedro_args.get("env", ""),
-            extra_params=kedro_args.get("params", ""),
-            conf_source=kedro_args.get("conf_source", ""),
-            **kedro_session_create_args,  # TODO: Make sure that this not take precedence over kedro_args. We should do some prior merging before kwarging
-        ) as session:
+        with (
+            KedroSession.create(
+                env=kedro_args.get("env", ""),
+                runtime_params=kedro_args.get("params", ""),
+                conf_source=kedro_args.get("conf_source", ""),
+                **kedro_session_create_args,  # TODO: Make sure that this not take precedence over kedro_args. We should do some prior merging before kwarging
+            ) as session
+        ):
             config_loader = session._get_config_loader()
             if app:
                 runner = KedroBootAdapter(
@@ -95,7 +97,8 @@ def create_kedro_booter(
                 to_outputs=kedro_args.get("to_outputs", ""),
                 load_versions=kedro_args.get("load_versions", {}),
                 pipeline_name=kedro_args.get("pipeline", ""),
-                namespace=kedro_args.get("namespace", ""),
+                namespaces=kedro_args.get("namespaces", ""),
+                only_missing_outputs=kedro_args.get("only_missing_outputs", ""),
             )
 
     return kedro_booter

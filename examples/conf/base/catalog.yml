@@ -51,7 +51,7 @@ features:
 #   type: pickle.PickleDataSet
 #   filepath: data/06_models/regressor.pickle
 
-training.regressor:
+"{namespace}.regressor":
   type: pickle.PickleDataset
   filepath: data/06_models/regressor.pickle
 
