@@ -7,7 +7,7 @@
 
 # What is kedro-boot ?
 Kedro Boot simplifies the integration of your Kedro pipelines with any applications. It's a framework for creating APIs and SDKs for your Kedro projects.
-It offers these key functionalities: 
+It offers these key functionalities:
 
 - :syringe: **Data injection**: Streamline the process of feeding data from any application into Kedro pipelines.
 - :zap: **Low-Latency**: Execute multiple pipeline runs with minimal delay with optimisation for time-sensitive web applications.
@@ -84,7 +84,7 @@ class KedroBootApp(AbstractKedroBootApp):
         # leveraging config_loader to manage app's configs
         my_app_configs = kedro_boot_session.config_loader[
             "my_app"
-        ]  # You should delcare this config pattern in settings.py
+        ]  # You should declare this config pattern in settings.py
 
         for _ in my_app_configs.get("num_iteration"):  # Doing mutliples pipeline runs
             kedro_boot_session.run(
@@ -149,7 +149,7 @@ kedro boot fastapi <kedro_run_args>
 These production-ready features would be natively included in your FastAPI apps:
 
 - Embedded [Gunicorn web server](https://gunicorn.org/) (only for Linux and macOS)
-- [Pyctuator](https://github.com/SolarEdgeTech/pyctuator) that report some service health metrology and application states. Usually used by service orchestrators (kubernetes) or monitoring to track service health and ensure it's high availability
+- [Pyctuator](https://github.com/SolarEdgeTech/pyctuator) that report some service health metrology and application states. Usually used by service orchestrators (kubernetes) or monitoring to track service health and ensure its high availability
 - Multiple environments configurations, leveraging kedro's ``OmegaConfigLoader``. ``["fastapi*/"]`` config pattern could be used to configure the web server. Configs could also be passed as CLI args (refer to ``--help``)
 
 You can learn more by testing the [spaceflights Kedro FastAPI example](examples/README.md#rest-api-with-kedro-fastapi-server) that showcases serving multiples endpoints operations that are mapped to differents pipeline namespaces.

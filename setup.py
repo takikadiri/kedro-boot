@@ -32,12 +32,13 @@ setup(
     install_requires=base_requirements,
     extras_require={
         "doc": [
-            "sphinx>=4.5.0,<8.0.0",
-            "sphinx_rtd_theme>=1.0,<1.4",
+            "sphinx>=4.5.0,<9.0.0",
             "sphinx-markdown-tables~=0.0.15",
-            "sphinx-click>=3.1,<5.1",
+            "sphinx-click>=3.1,<6.1",
             "sphinx_copybutton~=0.5.0",
-            "myst-parser>=0.17.2,<2.1.0",
+            "myst-parser>=0.17.2,<4.1.0",
+            "sphinx_design>=0.6.0,<0.7.0",
+            "pydata-sphinx-theme>=0.16.0,<0.17.0",
         ],
         "test": [
             "pytest>=5.4.0, <8.0.0",

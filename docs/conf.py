@@ -27,7 +27,6 @@ release = kb_version
 
 
 # -- General configuration ---------------------------------------------------
-
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -44,10 +43,13 @@ extensions = [
     # "sphinx.ext.ifconfig",
     # "sphinx.ext.viewcode",
     # "nbsphinx",
+    "sphinx_design",  # responsive web component support
     "sphinx_copybutton",
     "sphinx_markdown_tables",
     "myst_parser",
 ]
+
+myst_enable_extensions = ["colon_fence"]
 
 # enable autosummary plugin (table of contents for modules/classes/class
 # methods)
@@ -71,12 +73,48 @@ pygments_style = "sphinx"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-html_theme = "sphinx_rtd_theme"
+
+html_theme = "pydata_sphinx_theme"  # see: https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/layout.html
 
 # useful to create dropdown with the name of the directory as the section name
 # see https://stackoverflow.com/questions/36925871/toctree-nested-drop-down:
-html_theme_options = {"collapse_navigation": False}
+html_theme_options = {
+    # "logo": {
+    #     "image_light": "source/imgs/logo.png",
+    #     "image_dark": "source/imgs/logo.png",
+    # },
+    # https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/header-links.html#fontawesome-icons
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/takikadiri/kedro-boot",
+            "icon": "fa-brands fa-github",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/kedro-boot/",
+            "icon": "fa-brands fa-python",
+        },
+        {
+            "name": "Slack",
+            "url": "https://kedro-org.slack.com/",
+            "icon": "fa-brands fa-slack",
+        },
+    ],
+    "navbar_start": ["navbar-logo"],  # "version-switcher" to be configured
+    "navbar_align": "content",
+    "header_links_before_dropdown": 4,
+    "secondary_sidebar_items": ["page-toc", "edit-this-page", "sourcelink"],
+    "use_edit_page_button": True,
+}
+html_context = {
+    "github_user": "takikadiri",
+    "github_repo": "kedro-boot",
+    "github_version": "main",
+    "doc_path": "docs/",  # why not "docs/source/"?
+    "default_mode": "light",
+}
+html_sidebars = {"index": []}
 
 
 myst_heading_anchors = 5

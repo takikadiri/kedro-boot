@@ -161,3 +161,4 @@ kedro.db
 .ruff_cache/
 
 notebooks/
+_build/
